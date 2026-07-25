@@ -41,14 +41,3 @@ const HOBBY_CATEGORY_COLOR_DARK: Record<HobbyCategory, string> = {
 export function hobbyCategoryColor(category: HobbyCategory, scheme: "light" | "dark"): string {
   return scheme === "dark" ? HOBBY_CATEGORY_COLOR_DARK[category] : HOBBY_CATEGORY_COLOR_LIGHT[category];
 }
-
-/**
- * The technique-detail sheet's "paper card" is always a light/cream surface,
- * even in dark mode (see Colors.dark.paperSurface) - so anything drawn on
- * it (or filled with a solid color under white text) needs the LIGHT-mode
- * category color regardless of the app's actual theme, or it reads as
- * low-contrast pastel-on-cream.
- */
-export function hobbyCategoryColorOnPaper(category: HobbyCategory): string {
-  return HOBBY_CATEGORY_COLOR_LIGHT[category];
-}

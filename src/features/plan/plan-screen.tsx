@@ -108,7 +108,7 @@ export function PlanScreen() {
 
       <TechniqueDetailSheet
         technique={selectedTechnique}
-        category={plan.hobbyCategory}
+        categoryColor={categoryColor}
         onClose={() => setSelectedTechniqueId(null)}
         onChangeStatus={handleChangeStatus}
       />

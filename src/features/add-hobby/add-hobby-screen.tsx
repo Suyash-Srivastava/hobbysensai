@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -66,96 +67,106 @@ export function AddHobbyScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <View
-          style={[
-            styles.hero,
-            { experimental_backgroundImage: `linear-gradient(135deg, ${theme.accent}66 0%, transparent 100%)` },
-          ]}
-        >
-          <ThemedText type="eyebrow">Mastery Setup</ThemedText>
-        </View>
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 96 : 0}
+      >
+        {/* Top inset is already handled by the native header (headerShown: true in _layout.tsx). */}
+        <SafeAreaView style={styles.flex} edges={["bottom", "left", "right"]}>
+          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+            <View
+              style={[
+                styles.hero,
+                { experimental_backgroundImage: `linear-gradient(135deg, ${theme.accent}66 0%, transparent 100%)` },
+              ]}
+            >
+              <ThemedText type="eyebrow">Mastery Setup</ThemedText>
+            </View>
 
-        <FormField
-          label="What are you learning?"
-          placeholder="e.g. chess, acoustic guitar, watercolor painting"
-          value={hobby}
-          onChangeText={setHobby}
-          error={fieldErrors.hobby}
-          required
-          editable={!mutation.isPending}
-        />
+            <FormField
+              label="What are you learning?"
+              placeholder="e.g. chess, acoustic guitar, watercolor painting"
+              value={hobby}
+              onChangeText={setHobby}
+              error={fieldErrors.hobby}
+              required
+              editable={!mutation.isPending}
+            />
 
-        <View style={styles.field}>
-          <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-            Your Level
-          </ThemedText>
-          <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
-        </View>
+            <View style={styles.field}>
+              <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+                Your Level
+              </ThemedText>
+              <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
+            </View>
 
-        <FormField
-          label="Main Goal"
-          placeholder="e.g. play my first jazz solo"
-          value={goal}
-          onChangeText={setGoal}
-          error={fieldErrors.goal}
-          required
-          editable={!mutation.isPending}
-          multiline
-        />
+            <FormField
+              label="Main Goal"
+              placeholder="e.g. play my first jazz solo"
+              value={goal}
+              onChangeText={setGoal}
+              error={fieldErrors.goal}
+              required
+              editable={!mutation.isPending}
+              multiline
+            />
 
-        <View style={styles.field}>
-          <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-            Weekly Budget
-          </ThemedText>
-          <View style={styles.sliderRow}>
-            <ThemedText type="title" style={styles.sliderValue}>
-              {weeklyTimeBudgetHours}
+            <View style={styles.field}>
+              <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+                Weekly Budget
+              </ThemedText>
+              <View style={styles.sliderRow}>
+                <ThemedText type="title" style={styles.sliderValue}>
+                  {weeklyTimeBudgetHours}
+                </ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  hours / week
+                </ThemedText>
+              </View>
+              <Slider
+                testID="weekly-budget-slider"
+                minimumValue={1}
+                maximumValue={20}
+                step={1}
+                value={weeklyTimeBudgetHours}
+                onValueChange={setWeeklyTimeBudgetHours}
+                disabled={mutation.isPending}
+                minimumTrackTintColor={theme.accent}
+                maximumTrackTintColor={theme.border}
+                thumbTintColor={theme.accent}
+              />
+            </View>
+
+            {mutation.isError ? (
+              <ThemedText type="small" style={{ color: theme.error }}>
+                {(mutation.error as Error).message}
+              </ThemedText>
+            ) : null}
+
+            <Button
+              label="Generate My Plan"
+              icon="✨"
+              onPress={handleSubmit}
+              disabled={mutation.isPending}
+              loading={mutation.isPending}
+              testID="generate-plan-button"
+              style={styles.submitButton}
+            />
+
+            <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
+              HobbySensai will draft a focused technique list based on your level and goal.
             </ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              hours / week
-            </ThemedText>
-          </View>
-          <Slider
-            testID="weekly-budget-slider"
-            minimumValue={1}
-            maximumValue={20}
-            step={1}
-            value={weeklyTimeBudgetHours}
-            onValueChange={setWeeklyTimeBudgetHours}
-            disabled={mutation.isPending}
-            minimumTrackTintColor={theme.accent}
-            maximumTrackTintColor={theme.border}
-            thumbTintColor={theme.accent}
-          />
-        </View>
-
-        {mutation.isError ? (
-          <ThemedText type="small" style={{ color: theme.error }}>
-            {(mutation.error as Error).message}
-          </ThemedText>
-        ) : null}
-
-        <Button
-          label="Generate My Plan"
-          icon="✨"
-          onPress={handleSubmit}
-          disabled={mutation.isPending}
-          loading={mutation.isPending}
-          testID="generate-plan-button"
-          style={styles.submitButton}
-        />
-
-        <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
-          HobbySensai will draft a focused technique list based on your level and goal.
-        </ThemedText>
-      </ScrollView>
+          </ScrollView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center" },
+  flex: { flex: 1, width: "100%", alignItems: "center" },
   scroll: {
     width: "100%",
     maxWidth: MaxContentWidth,

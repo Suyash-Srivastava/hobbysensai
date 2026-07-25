@@ -3,8 +3,7 @@ import { ExternalLink } from "@/components/external-link";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
-import type { HobbyCategory, Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
-import { hobbyCategoryColorOnPaper } from "@/features/home/hobby-category-icon";
+import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { searchUrlFor } from "./search-url";
 
 const RESOURCE_TYPE_LABEL: Record<Technique["resourceType"], string> = {
@@ -28,22 +27,18 @@ const SKIPPED_COLOR = "#71717a";
 
 interface TechniqueDetailContentProps {
   technique: Technique;
-  category: HobbyCategory;
+  categoryColor: string;
   onClose: () => void;
   onChangeStatus: (status: TechniqueStatus) => void;
 }
 
-export function TechniqueDetailContent({ technique, category, onClose, onChangeStatus }: TechniqueDetailContentProps) {
+export function TechniqueDetailContent({ technique, categoryColor, onClose, onChangeStatus }: TechniqueDetailContentProps) {
   const theme = useTheme();
-  // The card underneath this content is always a light/cream "paper"
-  // surface (even in dark mode - see Colors.dark.paperSurface), so it
-  // always needs the light-mode category color, regardless of app theme.
-  const categoryColor = hobbyCategoryColorOnPaper(category);
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <ThemedText type="subtitle" style={[styles.title, { color: theme.paperText }]}>
+        <ThemedText type="subtitle" style={styles.title}>
           {technique.title}
         </ThemedText>
         <Pressable
@@ -53,7 +48,7 @@ export function TechniqueDetailContent({ technique, category, onClose, onChangeS
           android_ripple={{ color: theme.borderStrong, borderless: true, radius: 20 }}
           style={[styles.closeButton, { backgroundColor: theme.backgroundSelected }]}
         >
-          <ThemedText style={[styles.closeIcon, { color: theme.paperText }]}>✕</ThemedText>
+          <ThemedText style={styles.closeIcon}>✕</ThemedText>
         </Pressable>
       </View>
 
@@ -64,19 +59,17 @@ export function TechniqueDetailContent({ technique, category, onClose, onChangeS
       <View style={styles.rationaleBlock}>
         <View style={[styles.rationaleBar, { backgroundColor: categoryColor }]} />
         <View style={styles.rationaleTextBlock}>
-          <ThemedText type="eyebrow" style={{ color: theme.paperText, opacity: 0.6 }}>
+          <ThemedText type="eyebrow" themeColor="textSecondary">
             Rationale
           </ThemedText>
-          <ThemedText style={[styles.rationale, { color: theme.paperText }]}>{technique.rationale}</ThemedText>
+          <ThemedText style={styles.rationale}>{technique.rationale}</ThemedText>
         </View>
       </View>
 
       <ExternalLink href={searchUrlFor(technique.resourceType, technique.searchQuery)} style={styles.searchLinkWrapper}>
         <View style={[styles.searchLink, { backgroundColor: theme.backgroundSelected }]}>
-          <ThemedText type="smallBold" style={{ color: theme.paperText }}>
-            📖 Find a lesson on this
-          </ThemedText>
-          <ThemedText style={{ color: theme.paperText }}>→</ThemedText>
+          <ThemedText type="smallBold">📖 Find a lesson on this</ThemedText>
+          <ThemedText>→</ThemedText>
         </View>
       </ExternalLink>
 
@@ -96,7 +89,7 @@ export function TechniqueDetailContent({ technique, category, onClose, onChangeS
                 selected && { backgroundColor: selectedColor, borderColor: selectedColor },
               ]}
             >
-              <ThemedText type="eyebrow" style={{ color: selected ? "#FFFFFF" : theme.paperText }}>
+              <ThemedText type="eyebrow" style={selected && { color: theme.accentText }}>
                 {option.icon} {option.label}
               </ThemedText>
             </Pressable>

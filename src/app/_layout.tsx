@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import { useColorScheme } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 // Importing from each weight's own submodule (not the package's top-level
 // index) matters: the top-level index re-exports all 18 weight variants as
@@ -62,24 +63,26 @@ export default function RootLayout() {
   const theme = Colors[colorScheme === "dark" ? "dark" : "light"];
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen
-            name="add-hobby"
-            options={{
-              presentation: "modal",
-              headerShown: true,
-              title: "New Hobby",
-              headerStyle: { backgroundColor: theme.background },
-              headerTintColor: theme.text,
-              headerTitleStyle: { fontFamily: Fonts.semibold },
-            }}
-          />
-          <Stack.Screen name="plan/[hobbyId]" />
-        </Stack>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen
+              name="add-hobby"
+              options={{
+                presentation: "modal",
+                headerShown: true,
+                title: "New Hobby",
+                headerStyle: { backgroundColor: theme.background },
+                headerTintColor: theme.text,
+                headerTitleStyle: { fontFamily: Fonts.semibold },
+              }}
+            />
+            <Stack.Screen name="plan/[hobbyId]" />
+          </Stack>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }

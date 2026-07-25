@@ -126,6 +126,7 @@ export function AddHobbyScreen() {
               </View>
               <Slider
                 testID="weekly-budget-slider"
+                style={styles.slider}
                 minimumValue={1}
                 maximumValue={20}
                 step={1}
@@ -187,6 +188,9 @@ const styles = StyleSheet.create({
   },
   sliderValue: {
     fontSize: 30,
+  },
+  slider: {
+    width: "100%",
   },
   submitButton: {
     marginTop: Spacing.two,

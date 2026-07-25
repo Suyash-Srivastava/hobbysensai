@@ -3,12 +3,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
 import type { HobbyPlan } from "@/shared/hobbyPlan.schema";
 import { HobbyCard } from "./hobby-card";
 
 export function HomeScreen() {
+  const theme = useTheme();
   const plans = useHobbyPlansStore((state) => state.plans);
   const streak = useHobbyPlansStore((state) => state.streak);
 
@@ -16,19 +18,17 @@ export function HomeScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <View>
-            <ThemedText type="title" style={styles.title}>
-              Your hobbies
-            </ThemedText>
-            <ThemedText type="small" themeColor="textSecondary">
-              A focused technique list per hobby - not an endless feed.
-            </ThemedText>
-            {streak.count > 0 ? (
-              <ThemedText type="small" themeColor="textSecondary">
-                🔥 {streak.count} day streak
-              </ThemedText>
-            ) : null}
-          </View>
+          <ThemedText type="title" style={styles.title}>
+            Your hobbies
+          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            A focused technique list per hobby - not an endless feed.
+          </ThemedText>
+          {streak.count > 0 ? (
+            <View style={[styles.streakPill, { backgroundColor: theme.backgroundSelected }]}>
+              <ThemedText type="smallBold">🔥 {streak.count} day streak</ThemedText>
+            </View>
+          ) : null}
         </View>
 
         {plans.length === 0 ? (
@@ -45,9 +45,13 @@ export function HomeScreen() {
         <Pressable
           testID="add-hobby-button"
           onPress={() => router.push("/add-hobby")}
-          style={({ pressed }) => [styles.addButton, pressed && styles.addButtonPressed]}
+          style={({ pressed }) => [
+            styles.addButton,
+            { backgroundColor: theme.accent },
+            pressed && styles.addButtonPressed,
+          ]}
         >
-          <ThemedText type="smallBold" style={styles.addButtonLabel}>
+          <ThemedText type="smallBold" style={[styles.addButtonLabel, { color: theme.accentText }]}>
             + Add a hobby
           </ThemedText>
         </Pressable>
@@ -84,14 +88,22 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: Spacing.three,
-    paddingBottom: Spacing.two,
+    paddingBottom: Spacing.four,
+    gap: Spacing.one,
   },
   title: {
-    fontSize: 32,
-    lineHeight: 38,
+    fontSize: 28,
+    lineHeight: 34,
+  },
+  streakPill: {
+    alignSelf: "flex-start",
+    borderRadius: Spacing.five,
+    paddingVertical: Spacing.one,
+    paddingHorizontal: Spacing.three,
+    marginTop: Spacing.one,
   },
   list: {
-    gap: Spacing.two,
+    gap: Spacing.three,
     paddingBottom: Spacing.six,
   },
   emptyState: {
@@ -114,15 +126,13 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: Spacing.four,
     alignSelf: "center",
-    backgroundColor: "#0ca30c",
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.five,
     borderRadius: Spacing.five,
+    boxShadow: Shadow.floating,
   },
   addButtonPressed: {
     opacity: 0.85,
   },
-  addButtonLabel: {
-    color: "#ffffff",
-  },
+  addButtonLabel: {},
 });

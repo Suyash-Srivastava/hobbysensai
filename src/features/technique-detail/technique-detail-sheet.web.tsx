@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import { ThemedView } from "@/components/themed-view";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { TechniqueDetailContent } from "./technique-detail-content";
 
@@ -47,5 +47,6 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.four,
     padding: Spacing.four,
     gap: Spacing.three,
+    boxShadow: Shadow.floating,
   },
 });

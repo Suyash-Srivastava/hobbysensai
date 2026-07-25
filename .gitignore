@@ -45,3 +45,7 @@ example
 
 .vercel
 .env*
+
+# Personal/local Claude Code skills - tooling, not app source
+.claude/skills/
+**/__pycache__/

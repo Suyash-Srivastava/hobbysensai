@@ -16,7 +16,13 @@ export function FormField({ label, error, style, ...inputProps }: FormFieldProps
       <ThemedText type="smallBold">{label}</ThemedText>
       <TextInput
         placeholderTextColor={theme.textSecondary}
-        style={[styles.input, { color: theme.text, backgroundColor: theme.backgroundElement }, style]}
+        textAlignVertical={inputProps.multiline ? "top" : undefined}
+        style={[
+          styles.input,
+          { color: theme.text, backgroundColor: theme.backgroundElement, borderColor: theme.border },
+          inputProps.multiline && styles.multilineInput,
+          style,
+        ]}
         {...inputProps}
       />
       {error ? (
@@ -34,9 +40,13 @@ const styles = StyleSheet.create({
   },
   input: {
     borderRadius: Spacing.three,
+    borderWidth: 1,
     paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two,
+    paddingVertical: Spacing.two + 2,
     fontSize: 16,
+  },
+  multilineInput: {
+    minHeight: 72,
   },
   error: {
     color: "#d03b3b",

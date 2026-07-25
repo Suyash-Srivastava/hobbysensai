@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
+import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 import type { HobbyLevel } from "@/shared/hobbyPlan.schema";
 
@@ -15,6 +16,8 @@ interface LevelSelectorProps {
 }
 
 export function LevelSelector({ value, onChange }: LevelSelectorProps) {
+  const theme = useTheme();
+
   return (
     <View style={styles.row}>
       {LEVELS.map((level) => {
@@ -24,9 +27,13 @@ export function LevelSelector({ value, onChange }: LevelSelectorProps) {
             key={level.value}
             testID={`level-${level.value}`}
             onPress={() => onChange(level.value)}
-            style={[styles.pill, selected && styles.pillSelected]}
+            style={[
+              styles.pill,
+              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
+              selected && { backgroundColor: theme.accent, borderColor: theme.accent },
+            ]}
           >
-            <ThemedText type="small" style={selected && styles.labelSelected}>
+            <ThemedText type="small" style={selected && { color: theme.accentText, fontWeight: "700" }}>
               {level.label}
             </ThemedText>
           </Pressable>
@@ -45,14 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.three,
+    borderWidth: 1,
     alignItems: "center",
-    backgroundColor: "#00000010",
-  },
-  pillSelected: {
-    backgroundColor: "#0ca30c",
-  },
-  labelSelected: {
-    color: "#ffffff",
-    fontWeight: "700",
   },
 });

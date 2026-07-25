@@ -4,7 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
 import { fetchLearningPlan } from "@/lib/api/learningPlanClient";
 import { generateId } from "@/lib/id";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
@@ -13,6 +14,7 @@ import { LevelSelector } from "./level-selector";
 import { FormField } from "./form-field";
 
 export function AddHobbyScreen() {
+  const theme = useTheme();
   const addPlan = useHobbyPlansStore((state) => state.addPlan);
 
   const [hobby, setHobby] = useState("");
@@ -107,12 +109,16 @@ export function AddHobbyScreen() {
           testID="generate-plan-button"
           onPress={handleSubmit}
           disabled={mutation.isPending}
-          style={({ pressed }) => [styles.submitButton, (pressed || mutation.isPending) && styles.submitButtonPressed]}
+          style={({ pressed }) => [
+            styles.submitButton,
+            { backgroundColor: theme.accent },
+            (pressed || mutation.isPending) && styles.submitButtonPressed,
+          ]}
         >
           {mutation.isPending ? (
-            <ActivityIndicator color="#ffffff" />
+            <ActivityIndicator color={theme.accentText} />
           ) : (
-            <ThemedText type="smallBold" style={styles.submitLabel}>
+            <ThemedText type="smallBold" style={{ color: theme.accentText }}>
               Build my learning plan
             </ThemedText>
           )}
@@ -139,13 +145,12 @@ const styles = StyleSheet.create({
   field: { gap: Spacing.one },
   mutationError: { color: "#d03b3b" },
   submitButton: {
-    backgroundColor: "#0ca30c",
     borderRadius: Spacing.three,
     paddingVertical: Spacing.three,
     alignItems: "center",
     marginTop: Spacing.two,
+    boxShadow: Shadow.card,
   },
   submitButtonPressed: { opacity: 0.85 },
-  submitLabel: { color: "#ffffff" },
   hint: { textAlign: "center" },
 });

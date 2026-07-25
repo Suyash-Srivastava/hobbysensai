@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import { ExternalLink } from "@/components/external-link";
 import { ThemedText } from "@/components/themed-text";
+import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { searchUrlFor } from "./search-url";
@@ -26,18 +27,20 @@ interface TechniqueDetailContentProps {
 }
 
 export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: TechniqueDetailContentProps) {
+  const theme = useTheme();
+
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <ThemedText type="subtitle" style={styles.title}>
+        <ThemedText type="smallBold" style={styles.title}>
           {technique.title}
         </ThemedText>
-        <Pressable testID="close-technique-detail" onPress={onClose} hitSlop={12}>
-          <ThemedText type="subtitle">✕</ThemedText>
+        <Pressable testID="close-technique-detail" onPress={onClose} hitSlop={12} style={[styles.closeButton, { backgroundColor: theme.backgroundSelected }]}>
+          <ThemedText style={styles.closeIcon}>✕</ThemedText>
         </Pressable>
       </View>
 
-      <ThemedText type="smallBold" themeColor="textSecondary">
+      <ThemedText type="small" themeColor="textSecondary">
         {RESOURCE_TYPE_LABEL[technique.resourceType]} · ~{technique.estimatedHours}h
       </ThemedText>
 
@@ -47,7 +50,7 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
         <ThemedText type="linkPrimary">Find a lesson on this →</ThemedText>
       </ExternalLink>
 
-      <View style={styles.statusRow}>
+      <View style={[styles.statusRow, { borderTopColor: theme.border }]}>
         {STATUS_OPTIONS.map((option) => {
           const selected = technique.status === option.value;
           return (
@@ -55,9 +58,13 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
               key={option.value}
               testID={`status-${option.value}`}
               onPress={() => onChangeStatus(option.value)}
-              style={[styles.statusPill, selected && styles.statusPillSelected]}
+              style={[
+                styles.statusPill,
+                { backgroundColor: theme.backgroundSelected, borderColor: theme.border },
+                selected && { backgroundColor: theme.accent, borderColor: theme.accent },
+              ]}
             >
-              <ThemedText type="small" style={selected && styles.statusLabelSelected}>
+              <ThemedText type="smallBold" style={selected && { color: theme.accentText }}>
                 {option.label}
               </ThemedText>
             </Pressable>
@@ -70,39 +77,50 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
 
 const styles = StyleSheet.create({
   container: {
-    gap: Spacing.three,
+    gap: Spacing.two,
   },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    gap: Spacing.two,
+    gap: Spacing.three,
   },
   title: {
     flex: 1,
+    fontSize: 20,
+    lineHeight: 26,
+  },
+  closeButton: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  closeIcon: {
+    fontSize: 14,
+    fontWeight: "700",
   },
   rationale: {
     lineHeight: 22,
+    marginTop: Spacing.one,
   },
   searchLink: {
     alignSelf: "flex-start",
+    marginTop: Spacing.one,
   },
   statusRow: {
     flexDirection: "row",
     gap: Spacing.two,
+    marginTop: Spacing.two,
+    paddingTop: Spacing.three,
+    borderTopWidth: 1,
   },
   statusPill: {
     flex: 1,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.three,
+    borderWidth: 1,
     alignItems: "center",
-    backgroundColor: "#00000010",
-  },
-  statusPillSelected: {
-    backgroundColor: "#0ca30c",
-  },
-  statusLabelSelected: {
-    color: "#ffffff",
-    fontWeight: "700",
   },
 });

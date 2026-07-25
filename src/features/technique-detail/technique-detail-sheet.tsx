@@ -1,7 +1,8 @@
 import { Modal, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/themed-view";
-import { Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
+import { Shadow, Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { TechniqueDetailContent } from "./technique-detail-content";
 
@@ -17,12 +18,14 @@ interface TechniqueDetailSheetProps {
  * convention, via Expo's file-extension platform split.
  */
 export function TechniqueDetailSheet({ technique, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
+  const theme = useTheme();
+
   return (
     <Modal visible={technique !== null} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} />
       <SafeAreaView style={styles.sheetWrapper} pointerEvents="box-none">
         <ThemedView type="backgroundElement" style={styles.sheet}>
-          <ThemedView type="backgroundSelected" style={styles.handle} />
+          <ThemedView style={[styles.handle, { backgroundColor: theme.borderStrong }]} />
           {technique ? (
             <TechniqueDetailContent technique={technique} onClose={onClose} onChangeStatus={onChangeStatus} />
           ) : null}
@@ -35,7 +38,7 @@ export function TechniqueDetailSheet({ technique, onClose, onChangeStatus }: Tec
 const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: "rgba(0,0,0,0.55)",
   },
   sheetWrapper: {
     flex: 1,
@@ -46,12 +49,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: Spacing.four,
     padding: Spacing.four,
     gap: Spacing.three,
+    boxShadow: Shadow.floating,
   },
   handle: {
     alignSelf: "center",
     width: 40,
-    height: 4,
-    borderRadius: 2,
+    height: 5,
+    borderRadius: 3,
     marginBottom: Spacing.two,
   },
 });

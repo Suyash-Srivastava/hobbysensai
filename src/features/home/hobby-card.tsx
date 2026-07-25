@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, useColorScheme, View } from "react-native";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -6,7 +6,7 @@ import { ProgressRing } from "@/components/progress-ring";
 import { useTheme } from "@/hooks/use-theme";
 import { Shadow, Spacing } from "@/constants/theme";
 import { hobbyProgress, type HobbyPlan } from "@/shared/hobbyPlan.schema";
-import { HOBBY_CATEGORY_EMOJI } from "./hobby-category-icon";
+import { HOBBY_CATEGORY_EMOJI, hobbyCategoryColor } from "./hobby-category-icon";
 
 interface HobbyCardProps {
   plan: HobbyPlan;
@@ -14,16 +14,19 @@ interface HobbyCardProps {
 
 export function HobbyCard({ plan }: HobbyCardProps) {
   const theme = useTheme();
+  const scheme = useColorScheme() === "dark" ? "dark" : "light";
   const { mastered, total, percent } = hobbyProgress(plan);
+  const categoryColor = hobbyCategoryColor(plan.hobbyCategory, scheme);
 
   return (
     <Pressable
       testID={`hobby-card-${plan.id}`}
       onPress={() => router.push(`/plan/${plan.id}`)}
+      android_ripple={{ color: theme.borderStrong }}
       style={({ pressed }) => [pressed && styles.pressed]}
     >
       <ThemedView type="backgroundElement" style={[styles.card, { borderColor: theme.border }]}>
-        <View style={[styles.iconTile, { backgroundColor: theme.backgroundSelected }]}>
+        <View style={[styles.iconTile, { backgroundColor: `${categoryColor}26` }]}>
           <ThemedText style={styles.iconEmoji}>{HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]}</ThemedText>
         </View>
         <View style={styles.textColumn}>

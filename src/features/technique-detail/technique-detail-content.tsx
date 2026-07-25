@@ -35,7 +35,13 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
         <ThemedText type="smallBold" style={styles.title}>
           {technique.title}
         </ThemedText>
-        <Pressable testID="close-technique-detail" onPress={onClose} hitSlop={12} style={[styles.closeButton, { backgroundColor: theme.backgroundSelected }]}>
+        <Pressable
+          testID="close-technique-detail"
+          onPress={onClose}
+          hitSlop={12}
+          android_ripple={{ color: theme.borderStrong, borderless: true, radius: 20 }}
+          style={[styles.closeButton, { backgroundColor: theme.backgroundSelected }]}
+        >
           <ThemedText style={styles.closeIcon}>✕</ThemedText>
         </Pressable>
       </View>
@@ -58,6 +64,7 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
               key={option.value}
               testID={`status-${option.value}`}
               onPress={() => onChangeStatus(option.value)}
+              android_ripple={{ color: theme.borderStrong }}
               style={[
                 styles.statusPill,
                 { backgroundColor: theme.backgroundSelected, borderColor: theme.border },

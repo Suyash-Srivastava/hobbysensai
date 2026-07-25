@@ -27,6 +27,7 @@ export function LevelSelector({ value, onChange }: LevelSelectorProps) {
             key={level.value}
             testID={`level-${level.value}`}
             onPress={() => onChange(level.value)}
+            android_ripple={{ color: theme.borderStrong }}
             style={[
               styles.pill,
               { backgroundColor: theme.backgroundElement, borderColor: theme.border },

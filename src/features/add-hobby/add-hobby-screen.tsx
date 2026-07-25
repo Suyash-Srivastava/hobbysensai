@@ -109,6 +109,7 @@ export function AddHobbyScreen() {
           testID="generate-plan-button"
           onPress={handleSubmit}
           disabled={mutation.isPending}
+          android_ripple={{ color: theme.accentText }}
           style={({ pressed }) => [
             styles.submitButton,
             { backgroundColor: theme.accent },

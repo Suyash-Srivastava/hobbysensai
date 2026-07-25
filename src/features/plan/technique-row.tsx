@@ -34,7 +34,12 @@ export function TechniqueRow({ technique, onPress }: TechniqueRowProps) {
     technique.status === "mastered" ? theme.accentText : technique.status === "learning" ? theme.accent : theme.textSecondary;
 
   return (
-    <Pressable testID={`technique-row-${technique.id}`} onPress={onPress} style={({ pressed }) => pressed && styles.pressed}>
+    <Pressable
+      testID={`technique-row-${technique.id}`}
+      onPress={onPress}
+      android_ripple={{ color: theme.borderStrong }}
+      style={({ pressed }) => pressed && styles.pressed}
+    >
       <ThemedView type="backgroundElement" style={[styles.row, { borderColor: theme.border }]}>
         <View style={[styles.badge, badgeStyle]}>
           <ThemedText style={[styles.badgeIcon, { color: badgeTextColor }]}>{STATUS_ICON[technique.status]}</ThemedText>

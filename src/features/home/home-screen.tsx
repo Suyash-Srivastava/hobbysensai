@@ -45,6 +45,7 @@ export function HomeScreen() {
         <Pressable
           testID="add-hobby-button"
           onPress={() => router.push("/add-hobby")}
+          android_ripple={{ color: theme.accentText, borderless: false }}
           style={({ pressed }) => [
             styles.addButton,
             { backgroundColor: theme.accent },

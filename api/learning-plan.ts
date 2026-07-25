@@ -3,6 +3,7 @@ import { learningPlanRequestSchema } from "../src/shared/hobbyPlan.schema";
 import { generateLearningPlan, LearningPlanGenerationError } from "./_lib/services/learningPlan.service";
 import { getAIProvider } from "./_lib/providers/ai/factory";
 import { isRateLimited } from "./_lib/middleware/rateLimit";
+import { applyCors } from "./_lib/middleware/cors";
 import { config } from "./_lib/config";
 import { logger } from "./_lib/logger";
 
@@ -15,6 +16,8 @@ function clientKeyFor(req: VercelRequest): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) return;
+
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;

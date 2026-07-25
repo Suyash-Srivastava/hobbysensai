@@ -64,6 +64,19 @@ test("an invalid request body returns 400 and never calls the AI provider", asyn
   expect(getAIProvider).not.toHaveBeenCalled();
 });
 
+test("an OPTIONS preflight request gets a 204 with CORS headers, not a 405", async () => {
+  const { req, res } = createMocks<VercelRequest, VercelResponse>({
+    method: "OPTIONS",
+    headers: { "x-forwarded-for": "10.0.0.3" },
+  });
+
+  await handler(req, res);
+
+  expect(res._getStatusCode()).toBe(204);
+  expect(res.getHeader("Access-Control-Allow-Origin")).toBe("*");
+  expect(getAIProvider).not.toHaveBeenCalled();
+});
+
 test("requests beyond the configured rate limit receive 429", async () => {
   const validBody = {
     hobby: "guitar",

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FlatList, Platform, Pressable, StyleSheet, useColorScheme, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
@@ -19,6 +19,10 @@ export function PlanScreen() {
   const plan = useHobbyPlansStore((state) => state.plans.find((p) => p.id === hobbyId));
   const setTechniqueStatus = useHobbyPlansStore((state) => state.setTechniqueStatus);
   const scheme = useColorScheme() === "dark" ? "dark" : "light";
+  // useSafeAreaInsets (a hook) rather than <SafeAreaView> (a component) -
+  // more reliable when nested inside react-native-screens' native stack,
+  // which is what expo-router uses under the hood for this screen.
+  const insets = useSafeAreaInsets();
 
   const [selectedTechniqueId, setSelectedTechniqueId] = useState<string | null>(null);
   const [celebrationKey, setCelebrationKey] = useState(0);
@@ -26,12 +30,12 @@ export function PlanScreen() {
   if (!plan) {
     return (
       <ThemedView style={styles.container}>
-        <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
           <ThemedText type="subtitle">Hobby not found</ThemedText>
           <Pressable onPress={() => router.back()}>
             <ThemedText type="link">Go back</ThemedText>
           </Pressable>
-        </SafeAreaView>
+        </View>
       </ThemedView>
     );
   }
@@ -67,7 +71,7 @@ export function PlanScreen() {
         ]}
       />
       <MasteryCelebration triggerKey={celebrationKey} color={categoryColor} textColor={categoryTextColor} />
-      <SafeAreaView style={styles.safeArea}>
+      <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow}>
           <ThemedText type="link">← Home</ThemedText>
         </Pressable>
@@ -104,7 +108,7 @@ export function PlanScreen() {
             <TechniqueRow technique={item} categoryColor={categoryColor} onPress={() => setSelectedTechniqueId(item.id)} />
           )}
         />
-      </SafeAreaView>
+      </View>
 
       <TechniqueDetailSheet
         technique={selectedTechnique}

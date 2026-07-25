@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Slider from "@react-native-community/slider";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -18,6 +18,7 @@ import { FormField } from "./form-field";
 
 export function AddHobbyScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const addPlan = useHobbyPlansStore((state) => state.addPlan);
 
   const [hobby, setHobby] = useState("");
@@ -73,102 +74,79 @@ export function AddHobbyScreen() {
         keyboardVerticalOffset={Platform.OS === "ios" ? 96 : 0}
       >
         {/* Top inset is already handled by the native header (headerShown: true in _layout.tsx). */}
-        <SafeAreaView style={styles.flex} edges={["bottom", "left", "right"]}>
-          {/*
-            The width/maxWidth constraint lives on a plain inner View, not on
-            the ScrollView's contentContainerStyle - a ScrollView's content
-            container doesn't size like a normal flex View across platforms,
-            and mixing width:'100%' with maxWidth there was the actual cause
-            of this screen rendering wider than the device on native.
-          */}
-          <ScrollView style={styles.scrollOuter} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-            <View style={styles.formContent}>
-              <View
-                style={[
-                  styles.hero,
-                  { experimental_backgroundImage: `linear-gradient(135deg, ${theme.accent}66 0%, transparent 100%)` },
-                ]}
-              >
-                <ThemedText type="eyebrow">Mastery Setup</ThemedText>
-              </View>
+        <View style={[styles.formContent, { paddingBottom: Math.max(insets.bottom, Spacing.four) }]}>
+          <FormField
+            label="What are you learning?"
+            placeholder="e.g. chess, acoustic guitar, watercolor painting"
+            value={hobby}
+            onChangeText={setHobby}
+            error={fieldErrors.hobby}
+            required
+            editable={!mutation.isPending}
+          />
 
-              <FormField
-                label="What are you learning?"
-                placeholder="e.g. chess, acoustic guitar, watercolor painting"
-                value={hobby}
-                onChangeText={setHobby}
-                error={fieldErrors.hobby}
-                required
-                editable={!mutation.isPending}
-              />
+          <View style={styles.field}>
+            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+              Your Level
+            </ThemedText>
+            <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
+          </View>
 
-              <View style={styles.field}>
-                <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-                  Your Level
-                </ThemedText>
-                <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
-              </View>
+          <FormField
+            label="Main Goal"
+            placeholder="e.g. play my first jazz solo"
+            value={goal}
+            onChangeText={setGoal}
+            error={fieldErrors.goal}
+            required
+            editable={!mutation.isPending}
+            multiline
+          />
 
-              <FormField
-                label="Main Goal"
-                placeholder="e.g. play my first jazz solo"
-                value={goal}
-                onChangeText={setGoal}
-                error={fieldErrors.goal}
-                required
-                editable={!mutation.isPending}
-                multiline
-              />
-
-              <View style={styles.field}>
-                <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-                  Weekly Budget
-                </ThemedText>
-                <View style={styles.sliderRow}>
-                  <ThemedText type="title" style={styles.sliderValue}>
-                    {weeklyTimeBudgetHours}
-                  </ThemedText>
-                  <ThemedText type="small" themeColor="textSecondary">
-                    hours / week
-                  </ThemedText>
-                </View>
-                <Slider
-                  testID="weekly-budget-slider"
-                  style={styles.slider}
-                  minimumValue={1}
-                  maximumValue={20}
-                  step={1}
-                  value={weeklyTimeBudgetHours}
-                  onValueChange={setWeeklyTimeBudgetHours}
-                  disabled={mutation.isPending}
-                  minimumTrackTintColor={theme.accent}
-                  maximumTrackTintColor={theme.border}
-                  thumbTintColor={theme.accent}
-                />
-              </View>
-
-              {mutation.isError ? (
-                <ThemedText type="small" style={{ color: theme.error }}>
-                  {(mutation.error as Error).message}
-                </ThemedText>
-              ) : null}
-
-              <Button
-                label="Generate My Plan"
-                icon="✨"
-                onPress={handleSubmit}
-                disabled={mutation.isPending}
-                loading={mutation.isPending}
-                testID="generate-plan-button"
-                style={styles.submitButton}
-              />
-
-              <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
-                HobbySensai will draft a focused technique list based on your level and goal.
+          <View style={styles.field}>
+            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+              Weekly Budget
+            </ThemedText>
+            <View style={styles.sliderRow}>
+              <ThemedText type="title" style={styles.sliderValue}>
+                {weeklyTimeBudgetHours}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                hours / week
               </ThemedText>
             </View>
-          </ScrollView>
-        </SafeAreaView>
+            <Slider
+              testID="weekly-budget-slider"
+              style={styles.slider}
+              minimumValue={1}
+              maximumValue={20}
+              step={1}
+              value={weeklyTimeBudgetHours}
+              onValueChange={setWeeklyTimeBudgetHours}
+              disabled={mutation.isPending}
+              minimumTrackTintColor={theme.accent}
+              maximumTrackTintColor={theme.border}
+              thumbTintColor={theme.accent}
+            />
+          </View>
+
+          {mutation.isError ? (
+            <ThemedText type="small" style={{ color: theme.error }}>
+              {(mutation.error as Error).message}
+            </ThemedText>
+          ) : null}
+
+          <View style={styles.spacer} />
+
+          <Button
+            label="Generate My Plan"
+            icon="✨"
+            onPress={handleSubmit}
+            disabled={mutation.isPending}
+            loading={mutation.isPending}
+            testID="generate-plan-button"
+          />
+        </View>
       </KeyboardAvoidingView>
     </ThemedView>
   );
@@ -177,24 +155,13 @@ export function AddHobbyScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center" },
   flex: { flex: 1, width: "100%", alignItems: "center" },
-  scrollOuter: {
-    width: "100%",
-  },
-  scrollContent: {
-    alignItems: "center",
-    flexGrow: 1,
-  },
   formContent: {
+    flex: 1,
     width: "100%",
     maxWidth: MaxContentWidth,
-    padding: Spacing.four,
-    gap: Spacing.four,
-  },
-  hero: {
-    height: 96,
-    borderRadius: Spacing.four,
-    padding: Spacing.three,
-    justifyContent: "flex-end",
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.three,
+    gap: Spacing.three,
   },
   field: { gap: Spacing.one },
   sliderRow: {
@@ -203,15 +170,13 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   sliderValue: {
-    fontSize: 30,
+    fontSize: 28,
   },
   slider: {
     width: "100%",
   },
-  submitButton: {
-    marginTop: Spacing.two,
-  },
-  hint: {
-    textAlign: "center",
+  spacer: {
+    flex: 1,
+    minHeight: Spacing.two,
   },
 });

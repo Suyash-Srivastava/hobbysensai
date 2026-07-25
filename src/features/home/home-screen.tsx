@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -14,10 +14,14 @@ export function HomeScreen() {
   const plans = useHobbyPlansStore((state) => state.plans);
   const streak = useHobbyPlansStore((state) => state.streak);
   const lastActiveHobbyId = useHobbyPlansStore((state) => state.lastActiveHobbyId);
+  // useSafeAreaInsets (a hook) rather than <SafeAreaView> (a component) -
+  // more reliable when nested inside react-native-screens' native stack,
+  // which is what expo-router uses under the hood for this screen.
+  const insets = useSafeAreaInsets();
 
   return (
     <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
+      <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <ThemedText type="eyebrow">Studio Dashboard</ThemedText>
           <ThemedText type="title" style={styles.title}>
@@ -46,7 +50,7 @@ export function HomeScreen() {
             />
           </>
         )}
-      </SafeAreaView>
+      </View>
     </ThemedView>
   );
 }

@@ -170,7 +170,12 @@ One Vercel project serves both halves:
   `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_WINDOW_MS`) as environment
   variables in the Vercel project - never commit `.env`.
 
-Mobile is demoed via `npx expo start` and Expo Go rather than an EAS build.
+Mobile is demoed via `npx expo start` and Expo Go rather than an EAS build - the
+project deliberately pins **Expo SDK 54** rather than the newest SDK, since the
+public Expo Go app on both the Play Store and App Store was still stuck on SDK 54
+at the time of building this (the SDK 57 Expo Go build was in store review on both
+platforms). Pinning to 54 means the app installs straight from a QR code scan, no
+USB/ADB sideloading or development build required.
 
 ## A known limitation
 

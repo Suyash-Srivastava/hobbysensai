@@ -1,11 +1,9 @@
-/* eslint-disable react-hooks/refs --
- * This file intentionally uses the classic `Animated` API rather than Reanimated.
- * `react-hooks/refs` assumes animated values are Reanimated shared values accessed inside
- * useAnimatedStyle; Animated.Value's ref-like `.current`/`.interpolate()` pattern is its own
- * supported, non-worklet API and trips the same rule as a false positive. Pulling in
- * Reanimated's worklet runtime for this one cosmetic banner measured ~800KB added to the web
- * bundle - not worth it for a fade/slide Animated already does natively at near-zero cost.
- */
+// This file intentionally uses the classic `Animated` API rather than Reanimated:
+// pulling in Reanimated's worklet runtime for this one cosmetic banner measured ~800KB
+// added to the web bundle - not worth it for a fade/slide Animated already does natively
+// at near-zero cost. (On newer eslint-plugin-react-hooks/React Compiler setups, this pattern
+// trips a react-hooks/refs false positive since it assumes Reanimated shared values - not
+// applicable on the eslint-config-expo version this project currently pins.)
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/themed-text";

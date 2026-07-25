@@ -32,7 +32,7 @@ export function TechniqueDetailSheet({ technique, onClose, onChangeStatus }: Tec
 
 const styles = StyleSheet.create({
   backdrop: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.4)",
   },
   centerWrapper: {

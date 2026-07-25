@@ -14,6 +14,10 @@ export const Colors = {
     backgroundElement: '#F0F0F3',
     backgroundSelected: '#E0E1E6',
     textSecondary: '#60646C',
+    // Status "good" green + hairline track, from the validated dataviz status
+    // palette - used for progress rings/meters, not themed per light/dark.
+    progressFill: '#0ca30c',
+    progressTrack: '#e1e0d9',
   },
   dark: {
     text: '#ffffff',
@@ -21,6 +25,8 @@ export const Colors = {
     backgroundElement: '#212225',
     backgroundSelected: '#2E3135',
     textSecondary: '#B0B4BA',
+    progressFill: '#0ca30c',
+    progressTrack: '#2c2c2a',
   },
 } as const;
 

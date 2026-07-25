@@ -14,24 +14,26 @@ const STATUS_ICON: Record<TechniqueStatus, string> = {
 
 interface TechniqueRowProps {
   technique: Technique;
+  /** The hobby's identity color - used for the mastered/learning badge instead of the generic app accent. */
+  categoryColor: string;
   onPress: () => void;
 }
 
-export function TechniqueRow({ technique, onPress }: TechniqueRowProps) {
+export function TechniqueRow({ technique, categoryColor, onPress }: TechniqueRowProps) {
   const theme = useTheme();
   const isSkipped = technique.status === "skipped";
 
   const badgeStyle =
     technique.status === "mastered"
-      ? { backgroundColor: theme.accent, borderColor: theme.accent }
+      ? { backgroundColor: categoryColor, borderColor: categoryColor }
       : technique.status === "learning"
-        ? { backgroundColor: `${theme.accent}26`, borderColor: theme.accent }
+        ? { backgroundColor: `${categoryColor}26`, borderColor: categoryColor }
         : technique.status === "skipped"
           ? { backgroundColor: theme.backgroundSelected, borderColor: theme.border }
           : { backgroundColor: "transparent", borderColor: theme.borderStrong };
 
   const badgeTextColor =
-    technique.status === "mastered" ? theme.accentText : technique.status === "learning" ? theme.accent : theme.textSecondary;
+    technique.status === "mastered" ? theme.accentText : technique.status === "learning" ? categoryColor : theme.textSecondary;
 
   return (
     <Pressable

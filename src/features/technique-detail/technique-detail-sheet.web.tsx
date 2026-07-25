@@ -6,6 +6,7 @@ import { TechniqueDetailContent } from "./technique-detail-content";
 
 interface TechniqueDetailSheetProps {
   technique: Technique | null;
+  categoryColor: string;
   onClose: () => void;
   onChangeStatus: (status: TechniqueStatus) => void;
 }
@@ -15,14 +16,19 @@ interface TechniqueDetailSheetProps {
  * sheet in technique-detail-sheet.tsx - same content, platform-appropriate
  * container, resolved automatically by Metro's .web.tsx convention.
  */
-export function TechniqueDetailSheet({ technique, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
+export function TechniqueDetailSheet({ technique, categoryColor, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
   return (
     <Modal visible={technique !== null} transparent animationType="fade" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} />
       <View style={styles.centerWrapper} pointerEvents="box-none">
         <ThemedView type="backgroundElement" style={styles.dialog}>
           {technique ? (
-            <TechniqueDetailContent technique={technique} onClose={onClose} onChangeStatus={onChangeStatus} />
+            <TechniqueDetailContent
+              technique={technique}
+              categoryColor={categoryColor}
+              onClose={onClose}
+              onChangeStatus={onChangeStatus}
+            />
           ) : null}
         </ThemedView>
       </View>

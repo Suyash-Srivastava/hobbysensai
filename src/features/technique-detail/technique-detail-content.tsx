@@ -20,13 +20,19 @@ const STATUS_OPTIONS: { value: TechniqueStatus; label: string }[] = [
   { value: "skipped", label: "Skip" },
 ];
 
+// "Learning" and "skipped" stay neutral status tones; "mastered" adopts the
+// hobby's own identity color, since that's the state worth celebrating.
+const LEARNING_COLOR = "#f5a524";
+const SKIPPED_COLOR = "#71717a";
+
 interface TechniqueDetailContentProps {
   technique: Technique;
+  categoryColor: string;
   onClose: () => void;
   onChangeStatus: (status: TechniqueStatus) => void;
 }
 
-export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: TechniqueDetailContentProps) {
+export function TechniqueDetailContent({ technique, categoryColor, onClose, onChangeStatus }: TechniqueDetailContentProps) {
   const theme = useTheme();
 
   return (
@@ -59,6 +65,7 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
       <View style={[styles.statusRow, { borderTopColor: theme.border }]}>
         {STATUS_OPTIONS.map((option) => {
           const selected = technique.status === option.value;
+          const selectedColor = option.value === "mastered" ? categoryColor : option.value === "learning" ? LEARNING_COLOR : SKIPPED_COLOR;
           return (
             <Pressable
               key={option.value}
@@ -68,7 +75,7 @@ export function TechniqueDetailContent({ technique, onClose, onChangeStatus }: T
               style={[
                 styles.statusPill,
                 { backgroundColor: theme.backgroundSelected, borderColor: theme.border },
-                selected && { backgroundColor: theme.accent, borderColor: theme.accent },
+                selected && { backgroundColor: selectedColor, borderColor: selectedColor },
               ]}
             >
               <ThemedText type="smallBold" style={selected && { color: theme.accentText }}>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FlatList, Platform, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, Platform, Pressable, StyleSheet, useColorScheme, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
@@ -9,7 +9,7 @@ import { ProgressRing } from "@/components/progress-ring";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
 import { hobbyProgress, type Technique, type TechniqueStatus } from "@/shared/hobbyPlan.schema";
-import { HOBBY_CATEGORY_EMOJI } from "@/features/home/hobby-category-icon";
+import { HOBBY_CATEGORY_EMOJI, hobbyCategoryColor } from "@/features/home/hobby-category-icon";
 import { TechniqueDetailSheet } from "@/features/technique-detail/technique-detail-sheet";
 import { TechniqueRow } from "./technique-row";
 import { MasteryCelebration } from "./mastery-celebration";
@@ -19,6 +19,7 @@ export function PlanScreen() {
   const plan = useHobbyPlansStore((state) => state.plans.find((p) => p.id === hobbyId));
   const streak = useHobbyPlansStore((state) => state.streak);
   const setTechniqueStatus = useHobbyPlansStore((state) => state.setTechniqueStatus);
+  const scheme = useColorScheme() === "dark" ? "dark" : "light";
 
   const [selectedTechniqueId, setSelectedTechniqueId] = useState<string | null>(null);
   const [celebrationKey, setCelebrationKey] = useState(0);
@@ -36,6 +37,7 @@ export function PlanScreen() {
     );
   }
 
+  const categoryColor = hobbyCategoryColor(plan.hobbyCategory, scheme);
   const { mastered, total, percent } = hobbyProgress(plan);
   const selectedTechnique = plan.techniques.find((t) => t.id === selectedTechniqueId) ?? null;
   const sortedTechniques = [...plan.techniques].sort((a, b) => a.order - b.order);
@@ -54,6 +56,13 @@ export function PlanScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <View
+        pointerEvents="none"
+        style={[
+          styles.headerWash,
+          { experimental_backgroundImage: `linear-gradient(180deg, ${categoryColor}3d 0%, transparent 100%)` },
+        ]}
+      />
       <MasteryCelebration triggerKey={celebrationKey} />
       <SafeAreaView style={styles.safeArea}>
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow}>
@@ -61,9 +70,12 @@ export function PlanScreen() {
         </Pressable>
 
         <View style={styles.header}>
+          <View style={[styles.categoryTile, { backgroundColor: `${categoryColor}26` }]}>
+            <ThemedText style={styles.categoryEmoji}>{HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]}</ThemedText>
+          </View>
           <View style={styles.headerText}>
             <ThemedText type="title" style={styles.title} numberOfLines={2}>
-              {HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]} {plan.hobby}
+              {plan.hobby}
             </ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
               {plan.currentLevel} · {plan.goal}
@@ -74,7 +86,7 @@ export function PlanScreen() {
               </ThemedText>
             ) : null}
           </View>
-          <ProgressRing percent={percent} size={64} strokeWidth={7} />
+          <ProgressRing percent={percent} size={64} strokeWidth={7} color={categoryColor} />
         </View>
 
         <ThemedText type="small" themeColor="textSecondary" style={styles.progressLabel}>
@@ -86,13 +98,14 @@ export function PlanScreen() {
           keyExtractor={(technique) => technique.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <TechniqueRow technique={item} onPress={() => setSelectedTechniqueId(item.id)} />
+            <TechniqueRow technique={item} categoryColor={categoryColor} onPress={() => setSelectedTechniqueId(item.id)} />
           )}
         />
       </SafeAreaView>
 
       <TechniqueDetailSheet
         technique={selectedTechnique}
+        categoryColor={categoryColor}
         onClose={() => setSelectedTechniqueId(null)}
         onChangeStatus={handleChangeStatus}
       />
@@ -105,6 +118,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
+  headerWash: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 280,
+  },
   safeArea: {
     flex: 1,
     width: "100%",
@@ -116,21 +136,31 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: Spacing.two,
+    paddingTop: Spacing.three,
     gap: Spacing.three,
+  },
+  categoryTile: {
+    width: 52,
+    height: 52,
+    borderRadius: Spacing.three,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  categoryEmoji: {
+    fontSize: 26,
   },
   headerText: {
     flex: 1,
     gap: Spacing.half,
   },
   title: {
-    fontSize: 26,
-    lineHeight: 32,
+    fontSize: 24,
+    lineHeight: 30,
+    textTransform: "capitalize",
   },
   progressLabel: {
-    marginTop: Spacing.two,
+    marginTop: Spacing.three,
     marginBottom: Spacing.one,
   },
   list: {

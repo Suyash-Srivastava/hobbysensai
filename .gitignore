@@ -48,4 +48,6 @@ example
 
 # Personal/local Claude Code skills - tooling, not app source
 .claude/skills/
+.agents/
+skills-lock.json
 **/__pycache__/

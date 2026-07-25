@@ -8,6 +8,7 @@ import { TechniqueDetailContent } from "./technique-detail-content";
 
 interface TechniqueDetailSheetProps {
   technique: Technique | null;
+  categoryColor: string;
   onClose: () => void;
   onChangeStatus: (status: TechniqueStatus) => void;
 }
@@ -17,7 +18,7 @@ interface TechniqueDetailSheetProps {
  * technique-detail-sheet.web.tsx - same content, different platform
  * convention, via Expo's file-extension platform split.
  */
-export function TechniqueDetailSheet({ technique, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
+export function TechniqueDetailSheet({ technique, categoryColor, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
   const theme = useTheme();
 
   return (
@@ -27,7 +28,12 @@ export function TechniqueDetailSheet({ technique, onClose, onChangeStatus }: Tec
         <ThemedView type="backgroundElement" style={styles.sheet}>
           <ThemedView style={[styles.handle, { backgroundColor: theme.borderStrong }]} />
           {technique ? (
-            <TechniqueDetailContent technique={technique} onClose={onClose} onChangeStatus={onChangeStatus} />
+            <TechniqueDetailContent
+              technique={technique}
+              categoryColor={categoryColor}
+              onClose={onClose}
+              onChangeStatus={onChangeStatus}
+            />
           ) : null}
         </ThemedView>
       </SafeAreaView>

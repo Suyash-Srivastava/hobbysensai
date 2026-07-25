@@ -25,7 +25,10 @@ export function HobbyCard({ plan }: HobbyCardProps) {
       android_ripple={{ color: theme.borderStrong }}
       style={({ pressed }) => [pressed && styles.pressed]}
     >
-      <ThemedView type="backgroundElement" style={[styles.card, { borderColor: theme.border }]}>
+      <ThemedView
+        type="backgroundElement"
+        style={[styles.card, { borderColor: theme.border, borderLeftColor: categoryColor }]}
+      >
         <View style={[styles.iconTile, { backgroundColor: `${categoryColor}26` }]}>
           <ThemedText style={styles.iconEmoji}>{HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]}</ThemedText>
         </View>
@@ -37,7 +40,7 @@ export function HobbyCard({ plan }: HobbyCardProps) {
             {mastered}/{total} mastered · {plan.currentLevel}
           </ThemedText>
         </View>
-        <ProgressRing percent={percent} size={44} strokeWidth={5} />
+        <ProgressRing percent={percent} size={44} strokeWidth={5} color={categoryColor} />
       </ThemedView>
     </Pressable>
   );
@@ -49,6 +52,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: Spacing.four,
     borderWidth: 1,
+    borderLeftWidth: 4,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.three,
     gap: Spacing.three,

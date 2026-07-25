@@ -9,10 +9,13 @@ interface ProgressRingProps {
   strokeWidth?: number;
   showLabel?: boolean;
   testID?: string;
+  /** Overrides the default status-green fill - used to give each hobby its own ring color. */
+  color?: string;
 }
 
-export function ProgressRing({ percent, size = 56, strokeWidth = 6, showLabel = true, testID }: ProgressRingProps) {
+export function ProgressRing({ percent, size = 56, strokeWidth = 6, showLabel = true, testID, color }: ProgressRingProps) {
   const theme = useTheme();
+  const fill = color ?? theme.progressFill;
   const clamped = Math.max(0, Math.min(100, percent));
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -33,7 +36,7 @@ export function ProgressRing({ percent, size = 56, strokeWidth = 6, showLabel = 
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={theme.progressFill}
+          stroke={fill}
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={`${circumference} ${circumference}`}

@@ -1,14 +1,13 @@
 import { Modal, Pressable, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/themed-view";
-import { useTheme } from "@/hooks/use-theme";
 import { Shadow, Spacing } from "@/constants/theme";
-import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
+import type { HobbyCategory, Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { TechniqueDetailContent } from "./technique-detail-content";
 
 interface TechniqueDetailSheetProps {
   technique: Technique | null;
-  categoryColor: string;
+  category: HobbyCategory;
   onClose: () => void;
   onChangeStatus: (status: TechniqueStatus) => void;
 }
@@ -18,22 +17,15 @@ interface TechniqueDetailSheetProps {
  * technique-detail-sheet.web.tsx - same content, different platform
  * convention, via Expo's file-extension platform split.
  */
-export function TechniqueDetailSheet({ technique, categoryColor, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
-  const theme = useTheme();
-
+export function TechniqueDetailSheet({ technique, category, onClose, onChangeStatus }: TechniqueDetailSheetProps) {
   return (
     <Modal visible={technique !== null} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} />
       <SafeAreaView style={styles.sheetWrapper} pointerEvents="box-none">
-        <ThemedView type="backgroundElement" style={styles.sheet}>
-          <ThemedView style={[styles.handle, { backgroundColor: theme.borderStrong }]} />
+        <ThemedView type="paperSurface" style={styles.sheet}>
+          <ThemedView style={styles.handle} />
           {technique ? (
-            <TechniqueDetailContent
-              technique={technique}
-              categoryColor={categoryColor}
-              onClose={onClose}
-              onChangeStatus={onChangeStatus}
-            />
+            <TechniqueDetailContent technique={technique} category={category} onClose={onClose} onChangeStatus={onChangeStatus} />
           ) : null}
         </ThemedView>
       </SafeAreaView>
@@ -63,5 +55,6 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
     marginBottom: Spacing.two,
+    backgroundColor: "rgba(0,0,0,0.18)",
   },
 });

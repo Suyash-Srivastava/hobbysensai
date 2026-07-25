@@ -8,29 +8,47 @@ export const HOBBY_CATEGORY_EMOJI: Record<HobbyCategory, string> = {
   "knowledge-based": "📚",
 };
 
-// Category identity color, one distinct hue each, from the same validated
-// colorblind-safe categorical palette used for the progress ring (blue/
-// orange/yellow/magenta/violet slots) - deliberately excludes the green/red
-// slots since those are reserved as status colors (mastered/critical) and
-// reusing them here would blur "this is a category" with "this is a status".
-// (aqua was considered for strategy-game but reads too close to the green
-// status color at a glance - yellow is a cleaner break from it.)
+export const HOBBY_CATEGORY_LABEL: Record<HobbyCategory, string> = {
+  "physical-skill": "Physical Skill",
+  musical: "Musical",
+  "strategy-game": "Strategy Game",
+  "creative-craft": "Creative Craft",
+  "knowledge-based": "Knowledge Based",
+};
+
+// Category identity color, one distinct hue each - grounded in the design
+// mockups where they showed one (physical-skill=green, strategy-game=blue,
+// creative-craft=violet), filled in for the remaining two: musical takes a
+// warm rose (distinct from every other slot), knowledge-based reuses the
+// app's own Tertiary/eyebrow amber since "warm study" fits that brand hue
+// rather than inventing an unrelated sixth color.
 const HOBBY_CATEGORY_COLOR_LIGHT: Record<HobbyCategory, string> = {
-  "physical-skill": "#2a78d6",
-  musical: "#4a3aa7",
-  "strategy-game": "#eda100",
-  "creative-craft": "#e87ba4",
-  "knowledge-based": "#eb6834",
+  "physical-skill": "#0F7A38",
+  "strategy-game": "#2563EB",
+  "creative-craft": "#9333EA",
+  musical: "#DB2777",
+  "knowledge-based": "#B4550E",
 };
 
 const HOBBY_CATEGORY_COLOR_DARK: Record<HobbyCategory, string> = {
-  "physical-skill": "#3987e5",
-  musical: "#9085e9",
-  "strategy-game": "#c98500",
-  "creative-craft": "#d55181",
-  "knowledge-based": "#d95926",
+  "physical-skill": "#4ADE80",
+  "strategy-game": "#7FA8E8",
+  "creative-craft": "#C4A3F5",
+  musical: "#F472B6",
+  "knowledge-based": "#E0A458",
 };
 
 export function hobbyCategoryColor(category: HobbyCategory, scheme: "light" | "dark"): string {
   return scheme === "dark" ? HOBBY_CATEGORY_COLOR_DARK[category] : HOBBY_CATEGORY_COLOR_LIGHT[category];
+}
+
+/**
+ * The technique-detail sheet's "paper card" is always a light/cream surface,
+ * even in dark mode (see Colors.dark.paperSurface) - so anything drawn on
+ * it (or filled with a solid color under white text) needs the LIGHT-mode
+ * category color regardless of the app's actual theme, or it reads as
+ * low-contrast pastel-on-cream.
+ */
+export function hobbyCategoryColorOnPaper(category: HobbyCategory): string {
+  return HOBBY_CATEGORY_COLOR_LIGHT[category];
 }

@@ -2,17 +2,19 @@ import { Pressable, StyleSheet, useColorScheme, View } from "react-native";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { ProgressRing } from "@/components/progress-ring";
+import { ProgressBar } from "@/components/progress-bar";
 import { useTheme } from "@/hooks/use-theme";
 import { Shadow, Spacing } from "@/constants/theme";
 import { hobbyProgress, type HobbyPlan } from "@/shared/hobbyPlan.schema";
-import { HOBBY_CATEGORY_EMOJI, hobbyCategoryColor } from "./hobby-category-icon";
+import { HOBBY_CATEGORY_EMOJI, HOBBY_CATEGORY_LABEL, hobbyCategoryColor } from "./hobby-category-icon";
 
 interface HobbyCardProps {
   plan: HobbyPlan;
+  isContinue: boolean;
+  streakCount: number;
 }
 
-export function HobbyCard({ plan }: HobbyCardProps) {
+export function HobbyCard({ plan, isContinue, streakCount }: HobbyCardProps) {
   const theme = useTheme();
   const scheme = useColorScheme() === "dark" ? "dark" : "light";
   const { mastered, total, percent } = hobbyProgress(plan);
@@ -27,20 +29,46 @@ export function HobbyCard({ plan }: HobbyCardProps) {
     >
       <ThemedView
         type="backgroundElement"
-        style={[styles.card, { borderColor: theme.border, borderLeftColor: categoryColor }]}
+        style={[
+          styles.card,
+          { borderColor: isContinue ? categoryColor : theme.border },
+          isContinue && styles.cardContinue,
+        ]}
       >
-        <View style={[styles.iconTile, { backgroundColor: `${categoryColor}26` }]}>
-          <ThemedText style={styles.iconEmoji}>{HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]}</ThemedText>
+        <View style={styles.headerRow}>
+          <View style={styles.nameRow}>
+            <ThemedText style={styles.emoji}>{HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]}</ThemedText>
+            <ThemedText type="subtitle" style={styles.title} numberOfLines={1}>
+              {plan.hobby}
+            </ThemedText>
+          </View>
+          <View style={[styles.levelBadge, { backgroundColor: theme.backgroundSelected }]}>
+            <ThemedText type="small" style={styles.levelText} numberOfLines={1}>
+              {plan.currentLevel}
+            </ThemedText>
+          </View>
         </View>
-        <View style={styles.textColumn}>
-          <ThemedText type="smallBold" style={styles.title} numberOfLines={1}>
-            {plan.hobby}
+
+        <ThemedText type="eyebrow" style={{ color: categoryColor }}>
+          {HOBBY_CATEGORY_LABEL[plan.hobbyCategory]}
+        </ThemedText>
+
+        {isContinue && streakCount > 0 ? (
+          <View style={[styles.streakPill, { backgroundColor: `${categoryColor}22` }]}>
+            <ThemedText type="small" style={{ color: categoryColor }}>
+              🔥 {streakCount}-day streak
+            </ThemedText>
+          </View>
+        ) : null}
+
+        <View style={styles.progressRow}>
+          <ThemedText type="small" themeColor="textSecondary">
+            {mastered}/{total} mastered
           </ThemedText>
-          <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
-            {mastered}/{total} mastered · {plan.currentLevel}
-          </ThemedText>
+          <View style={styles.barWrapper}>
+            <ProgressBar percent={percent} color={categoryColor} showLabel />
+          </View>
         </View>
-        <ProgressRing percent={percent} size={44} strokeWidth={5} color={categoryColor} />
       </ThemedView>
     </Pressable>
   );
@@ -48,33 +76,57 @@ export function HobbyCard({ plan }: HobbyCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
-    alignItems: "center",
     borderRadius: Spacing.four,
     borderWidth: 1,
-    borderLeftWidth: 4,
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.three,
-    gap: Spacing.three,
+    padding: Spacing.three,
+    gap: Spacing.two,
     boxShadow: Shadow.card,
   },
-  iconTile: {
-    width: 44,
-    height: 44,
-    borderRadius: Spacing.three,
+  cardContinue: {
+    borderStyle: "dashed",
+    borderWidth: 1.5,
+  },
+  headerRow: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    gap: Spacing.two,
   },
-  iconEmoji: {
-    fontSize: 22,
-  },
-  textColumn: {
+  nameRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.two,
     flex: 1,
-    gap: Spacing.half,
+  },
+  emoji: {
+    fontSize: 20,
   },
   title: {
-    fontSize: 17,
+    fontSize: 19,
+    lineHeight: 24,
     textTransform: "capitalize",
+    flexShrink: 1,
+  },
+  levelBadge: {
+    borderRadius: Spacing.five,
+    paddingVertical: Spacing.half,
+    paddingHorizontal: Spacing.two,
+  },
+  levelText: {
+    textTransform: "capitalize",
+  },
+  streakPill: {
+    alignSelf: "flex-start",
+    borderRadius: Spacing.five,
+    paddingVertical: Spacing.half,
+    paddingHorizontal: Spacing.two,
+  },
+  progressRow: {
+    gap: Spacing.one,
+    marginTop: Spacing.one,
+  },
+  barWrapper: {
+    marginTop: 2,
   },
   pressed: {
     opacity: 0.7,

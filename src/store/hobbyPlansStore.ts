@@ -6,6 +6,8 @@ interface HobbyPlansStore {
   plans: HobbyPlan[];
   streak: Streak;
   hydrated: boolean;
+  /** Not persisted - which hobby to highlight as "continue" on Home, reset each app launch. */
+  lastActiveHobbyId: string | null;
   hydrate: () => Promise<void>;
   addPlan: (plan: HobbyPlan) => Promise<void>;
   removePlan: (planId: string) => Promise<void>;
@@ -22,6 +24,7 @@ export const useHobbyPlansStore = create<HobbyPlansStore>((set, get) => ({
   plans: [],
   streak: EMPTY_STREAK,
   hydrated: false,
+  lastActiveHobbyId: null,
 
   hydrate: async () => {
     const state = await hobbyPlansRepository.load();
@@ -30,13 +33,14 @@ export const useHobbyPlansStore = create<HobbyPlansStore>((set, get) => ({
 
   addPlan: async (plan) => {
     const plans = [...get().plans, plan];
-    set({ plans });
+    set({ plans, lastActiveHobbyId: plan.id });
     await hobbyPlansRepository.save({ plans, streak: get().streak });
   },
 
   removePlan: async (planId) => {
     const plans = get().plans.filter((plan) => plan.id !== planId);
-    set({ plans });
+    const lastActiveHobbyId = get().lastActiveHobbyId === planId ? null : get().lastActiveHobbyId;
+    set({ plans, lastActiveHobbyId });
     await hobbyPlansRepository.save({ plans, streak: get().streak });
   },
 
@@ -55,7 +59,7 @@ export const useHobbyPlansStore = create<HobbyPlansStore>((set, get) => ({
     // material - reverting to "not-started" or skipping a technique
     // shouldn't extend a streak.
     const streak = status === "learning" || status === "mastered" ? advanceStreak(get().streak) : get().streak;
-    set({ plans, streak });
+    set({ plans, streak, lastActiveHobbyId: planId });
     await hobbyPlansRepository.save({ plans, streak });
   },
 }));

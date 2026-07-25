@@ -28,13 +28,9 @@ export function LevelSelector({ value, onChange }: LevelSelectorProps) {
             testID={`level-${level.value}`}
             onPress={() => onChange(level.value)}
             android_ripple={{ color: theme.borderStrong }}
-            style={[
-              styles.pill,
-              { backgroundColor: theme.backgroundElement, borderColor: theme.border },
-              selected && { backgroundColor: theme.accent, borderColor: theme.accent },
-            ]}
+            style={[styles.pill, selected && { backgroundColor: theme.accent }]}
           >
-            <ThemedText type="small" style={selected && { color: theme.accentText, fontWeight: "700" }}>
+            <ThemedText type={selected ? "smallBold" : "small"} style={{ color: selected ? theme.accentText : theme.textSecondary }}>
               {level.label}
             </ThemedText>
           </Pressable>
@@ -53,7 +49,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Spacing.two,
     borderRadius: Spacing.three,
-    borderWidth: 1,
     alignItems: "center",
   },
 });

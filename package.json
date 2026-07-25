@@ -3,9 +3,12 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
+    "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@google/genai": "^2.13.0",
-    "@react-navigation/native": "^7.1.8",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/slider": "5.0.1",
+    "@react-navigation/native": "^7.1.8",
     "@tanstack/react-query": "^5.101.4",
     "expo": "~54.0.36",
     "expo-constants": "~18.0.13",

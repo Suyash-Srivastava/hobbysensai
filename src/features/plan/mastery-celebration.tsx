@@ -12,6 +12,15 @@ import { Spacing } from "@/constants/theme";
 interface MasteryCelebrationProps {
   /** Bump this to a new value each time a technique is mastered, to re-trigger the animation. */
   triggerKey: number;
+  /** The hobby's identity color, so the celebration matches the screen it's happening on. */
+  color: string;
+  /**
+   * Dark-mode category colors are light pastels (readable against a dark
+   * page); light-mode ones are saturated/dark (readable against a light
+   * page) - either way, the text sitting ON the color needs the opposite
+   * treatment from the app's own current-mode text color.
+   */
+  textColor: string;
 }
 
 /**
@@ -19,7 +28,7 @@ interface MasteryCelebrationProps {
  * tiny (no confetti library / particle system) so it reinforces the core
  * checklist loop instead of becoming its own feature.
  */
-export function MasteryCelebration({ triggerKey }: MasteryCelebrationProps) {
+export function MasteryCelebration({ triggerKey, color, textColor }: MasteryCelebrationProps) {
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -40,8 +49,8 @@ export function MasteryCelebration({ triggerKey }: MasteryCelebrationProps) {
   };
 
   return (
-    <Animated.View pointerEvents="none" style={[styles.banner, animatedStyle]}>
-      <ThemedText style={styles.text}>🎉 Technique mastered!</ThemedText>
+    <Animated.View pointerEvents="none" style={[styles.banner, { backgroundColor: color }, animatedStyle]}>
+      <ThemedText style={[styles.text, { color: textColor }]}>🎉 Technique mastered!</ThemedText>
     </Animated.View>
   );
 }
@@ -51,14 +60,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: Spacing.three,
     alignSelf: "center",
-    backgroundColor: "#0ca30c",
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.four,
     borderRadius: Spacing.five,
     zIndex: 10,
   },
   text: {
-    color: "#ffffff",
     fontWeight: "700",
   },
 });

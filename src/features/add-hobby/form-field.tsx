@@ -6,29 +6,42 @@ import { Spacing } from "@/constants/theme";
 interface FormFieldProps extends TextInputProps {
   label: string;
   error?: string;
+  required?: boolean;
 }
 
-export function FormField({ label, error, style, ...inputProps }: FormFieldProps) {
+export function FormField({ label, error, required, style, ...inputProps }: FormFieldProps) {
   const theme = useTheme();
 
   return (
     <View style={styles.container}>
-      <ThemedText type="smallBold">{label}</ThemedText>
+      <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+        {label}
+      </ThemedText>
       <TextInput
         placeholderTextColor={theme.textSecondary}
         textAlignVertical={inputProps.multiline ? "top" : undefined}
         style={[
           styles.input,
-          { color: theme.text, backgroundColor: theme.backgroundElement, borderColor: theme.border },
+          { color: theme.text, borderBottomColor: error ? theme.error : theme.border },
           inputProps.multiline && styles.multilineInput,
           style,
         ]}
         {...inputProps}
       />
       {error ? (
-        <ThemedText type="small" style={styles.error}>
-          {error}
-        </ThemedText>
+        <View style={styles.hintRow}>
+          <View style={[styles.dot, { backgroundColor: theme.error }]} />
+          <ThemedText type="small" style={{ color: theme.error }}>
+            {error}
+          </ThemedText>
+        </View>
+      ) : required ? (
+        <View style={styles.hintRow}>
+          <View style={[styles.dot, { backgroundColor: theme.borderStrong }]} />
+          <ThemedText type="small" themeColor="textSecondary">
+            Required
+          </ThemedText>
+        </View>
       ) : null}
     </View>
   );
@@ -39,16 +52,22 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   input: {
-    borderRadius: Spacing.three,
-    borderWidth: 1,
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.two + 2,
+    borderBottomWidth: 1.5,
+    paddingVertical: Spacing.two,
     fontSize: 16,
   },
   multilineInput: {
-    minHeight: 72,
+    minHeight: 64,
   },
-  error: {
-    color: "#d03b3b",
+  hintRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.one,
+    marginTop: 2,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
   },
 });

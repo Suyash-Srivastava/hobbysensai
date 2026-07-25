@@ -1,78 +1,53 @@
-import { FlatList, Pressable, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { useTheme } from "@/hooks/use-theme";
-import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
+import { Button } from "@/components/button";
+import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
 import type { HobbyPlan } from "@/shared/hobbyPlan.schema";
 import { HobbyCard } from "./hobby-card";
+import { EmptyState } from "./empty-state";
 
 export function HomeScreen() {
-  const theme = useTheme();
   const plans = useHobbyPlansStore((state) => state.plans);
   const streak = useHobbyPlansStore((state) => state.streak);
+  const lastActiveHobbyId = useHobbyPlansStore((state) => state.lastActiveHobbyId);
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
+          <ThemedText type="eyebrow">Studio Dashboard</ThemedText>
           <ThemedText type="title" style={styles.title}>
-            Your hobbies
+            Your Studio
           </ThemedText>
-          <ThemedText type="small" themeColor="textSecondary">
-            A focused technique list per hobby - not an endless feed.
-          </ThemedText>
-          {streak.count > 0 ? (
-            <View style={[styles.streakPill, { backgroundColor: theme.backgroundSelected }]}>
-              <ThemedText type="smallBold">🔥 {streak.count} day streak</ThemedText>
-            </View>
-          ) : null}
         </View>
 
         {plans.length === 0 ? (
           <EmptyState />
         ) : (
-          <FlatList<HobbyPlan>
-            data={plans}
-            keyExtractor={(plan) => plan.id}
-            contentContainerStyle={styles.list}
-            renderItem={({ item }) => <HobbyCard plan={item} />}
-          />
+          <>
+            <FlatList<HobbyPlan>
+              data={plans}
+              keyExtractor={(plan) => plan.id}
+              contentContainerStyle={styles.list}
+              renderItem={({ item }) => (
+                <HobbyCard plan={item} isContinue={item.id === lastActiveHobbyId} streakCount={streak.count} />
+              )}
+            />
+            <Button
+              label="Add a hobby"
+              icon="+"
+              onPress={() => router.push("/add-hobby")}
+              style={styles.addButton}
+              testID="add-hobby-button"
+            />
+          </>
         )}
-
-        <Pressable
-          testID="add-hobby-button"
-          onPress={() => router.push("/add-hobby")}
-          android_ripple={{ color: theme.accentText, borderless: false }}
-          style={({ pressed }) => [
-            styles.addButton,
-            { backgroundColor: theme.accent },
-            pressed && styles.addButtonPressed,
-          ]}
-        >
-          <ThemedText type="smallBold" style={[styles.addButtonLabel, { color: theme.accentText }]}>
-            + Add a hobby
-          </ThemedText>
-        </Pressable>
       </SafeAreaView>
     </ThemedView>
-  );
-}
-
-function EmptyState() {
-  return (
-    <View style={styles.emptyState}>
-      <ThemedText style={styles.emptyEmoji}>🌱</ThemedText>
-      <ThemedText type="subtitle" style={styles.emptyTitle}>
-        No hobbies yet
-      </ThemedText>
-      <ThemedText type="small" themeColor="textSecondary" style={styles.emptyBody}>
-        Add one below and get a focused, AI-built list of 5-8 techniques to learn - no endless
-        searching required.
-      </ThemedText>
-    </View>
   );
 }
 
@@ -93,47 +68,16 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   title: {
-    fontSize: 28,
-    lineHeight: 34,
-  },
-  streakPill: {
-    alignSelf: "flex-start",
-    borderRadius: Spacing.five,
-    paddingVertical: Spacing.one,
-    paddingHorizontal: Spacing.three,
-    marginTop: Spacing.one,
+    fontSize: 30,
   },
   list: {
     gap: Spacing.three,
     paddingBottom: Spacing.six,
   },
-  emptyState: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: Spacing.two,
-    paddingHorizontal: Spacing.four,
-  },
-  emptyEmoji: {
-    fontSize: 40,
-  },
-  emptyTitle: {
-    textAlign: "center",
-  },
-  emptyBody: {
-    textAlign: "center",
-  },
   addButton: {
     position: "absolute",
     bottom: Spacing.four,
-    alignSelf: "center",
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.five,
-    borderRadius: Spacing.five,
-    boxShadow: Shadow.floating,
+    left: Spacing.four,
+    right: Spacing.four,
   },
-  addButtonPressed: {
-    opacity: 0.85,
-  },
-  addButtonLabel: {},
 });

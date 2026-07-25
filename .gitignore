@@ -51,3 +51,6 @@ example
 .agents/
 skills-lock.json
 **/__pycache__/
+
+# Local design reference mockups - not app source
+.claude/ui screen/

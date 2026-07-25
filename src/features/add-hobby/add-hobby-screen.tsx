@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
+import Slider from "@react-native-community/slider";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { Button } from "@/components/button";
 import { useTheme } from "@/hooks/use-theme";
-import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
+import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { fetchLearningPlan } from "@/lib/api/learningPlanClient";
 import { generateId } from "@/lib/id";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
@@ -20,7 +22,7 @@ export function AddHobbyScreen() {
   const [hobby, setHobby] = useState("");
   const [currentLevel, setCurrentLevel] = useState<HobbyLevel>("beginner");
   const [goal, setGoal] = useState("");
-  const [weeklyTimeBudgetHours, setWeeklyTimeBudgetHours] = useState("3");
+  const [weeklyTimeBudgetHours, setWeeklyTimeBudgetHours] = useState(5);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const mutation = useMutation({ mutationFn: fetchLearningPlan });
@@ -30,7 +32,7 @@ export function AddHobbyScreen() {
       hobby,
       currentLevel,
       goal,
-      weeklyTimeBudgetHours: Number(weeklyTimeBudgetHours),
+      weeklyTimeBudgetHours,
     });
 
     if (!parsed.success) {
@@ -65,71 +67,88 @@ export function AddHobbyScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <View
+          style={[
+            styles.hero,
+            { experimental_backgroundImage: `linear-gradient(135deg, ${theme.accent}66 0%, transparent 100%)` },
+          ]}
+        >
+          <ThemedText type="eyebrow">Mastery Setup</ThemedText>
+        </View>
+
         <FormField
-          label="What hobby do you want to learn?"
+          label="What are you learning?"
           placeholder="e.g. chess, acoustic guitar, watercolor painting"
           value={hobby}
           onChangeText={setHobby}
           error={fieldErrors.hobby}
+          required
           editable={!mutation.isPending}
         />
 
         <View style={styles.field}>
-          <ThemedText type="smallBold">Current level</ThemedText>
+          <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+            Your Level
+          </ThemedText>
           <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
         </View>
 
         <FormField
-          label="What's your goal?"
-          placeholder="e.g. beat my friends casually, play campfire songs"
+          label="Main Goal"
+          placeholder="e.g. play my first jazz solo"
           value={goal}
           onChangeText={setGoal}
           error={fieldErrors.goal}
+          required
           editable={!mutation.isPending}
           multiline
         />
 
-        <FormField
-          label="Weekly time budget (hours)"
-          placeholder="3"
-          value={weeklyTimeBudgetHours}
-          onChangeText={setWeeklyTimeBudgetHours}
-          error={fieldErrors.weeklyTimeBudgetHours}
-          editable={!mutation.isPending}
-          keyboardType="numeric"
-        />
+        <View style={styles.field}>
+          <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+            Weekly Budget
+          </ThemedText>
+          <View style={styles.sliderRow}>
+            <ThemedText type="title" style={styles.sliderValue}>
+              {weeklyTimeBudgetHours}
+            </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              hours / week
+            </ThemedText>
+          </View>
+          <Slider
+            testID="weekly-budget-slider"
+            minimumValue={1}
+            maximumValue={20}
+            step={1}
+            value={weeklyTimeBudgetHours}
+            onValueChange={setWeeklyTimeBudgetHours}
+            disabled={mutation.isPending}
+            minimumTrackTintColor={theme.accent}
+            maximumTrackTintColor={theme.border}
+            thumbTintColor={theme.accent}
+          />
+        </View>
 
         {mutation.isError ? (
-          <ThemedText type="small" style={styles.mutationError}>
+          <ThemedText type="small" style={{ color: theme.error }}>
             {(mutation.error as Error).message}
           </ThemedText>
         ) : null}
 
-        <Pressable
-          testID="generate-plan-button"
+        <Button
+          label="Generate My Plan"
+          icon="✨"
           onPress={handleSubmit}
           disabled={mutation.isPending}
-          android_ripple={{ color: theme.accentText }}
-          style={({ pressed }) => [
-            styles.submitButton,
-            { backgroundColor: theme.accent },
-            (pressed || mutation.isPending) && styles.submitButtonPressed,
-          ]}
-        >
-          {mutation.isPending ? (
-            <ActivityIndicator color={theme.accentText} />
-          ) : (
-            <ThemedText type="smallBold" style={{ color: theme.accentText }}>
-              Build my learning plan
-            </ThemedText>
-          )}
-        </Pressable>
+          loading={mutation.isPending}
+          testID="generate-plan-button"
+          style={styles.submitButton}
+        />
 
-        {mutation.isPending ? (
-          <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
-            Designing a focused technique list for you - this usually takes a few seconds.
-          </ThemedText>
-        ) : null}
+        <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
+          HobbySensai will draft a focused technique list based on your level and goal.
+        </ThemedText>
       </ScrollView>
     </ThemedView>
   );
@@ -141,17 +160,27 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: MaxContentWidth,
     padding: Spacing.four,
-    gap: Spacing.three,
+    gap: Spacing.four,
+  },
+  hero: {
+    height: 96,
+    borderRadius: Spacing.four,
+    padding: Spacing.three,
+    justifyContent: "flex-end",
   },
   field: { gap: Spacing.one },
-  mutationError: { color: "#d03b3b" },
-  submitButton: {
-    borderRadius: Spacing.three,
-    paddingVertical: Spacing.three,
-    alignItems: "center",
-    marginTop: Spacing.two,
-    boxShadow: Shadow.card,
+  sliderRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    gap: Spacing.one,
   },
-  submitButtonPressed: { opacity: 0.85 },
-  hint: { textAlign: "center" },
+  sliderValue: {
+    fontSize: 30,
+  },
+  submitButton: {
+    marginTop: Spacing.two,
+  },
+  hint: {
+    textAlign: "center",
+  },
 });

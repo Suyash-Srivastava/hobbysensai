@@ -1,4 +1,4 @@
-import { StyleSheet, useColorScheme, View } from "react-native";
+import { ScrollView, StyleSheet, useColorScheme, View } from "react-native";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { Button } from "@/components/button";
@@ -21,7 +21,7 @@ export function EmptyState() {
   const scheme = useColorScheme() === "dark" ? "dark" : "light";
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <View style={styles.content}>
         <View style={styles.heroWrapper}>
           <EmptyStateHero />
@@ -51,23 +51,41 @@ export function EmptyState() {
           })}
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  // A ScrollView's contentContainerStyle, not a plain View: centering via
+  // justifyContent only looks right when the content actually fits the
+  // available height. Capping the hero's width (below) fixed the wide-and-
+  // short-on-content case, but a short *viewport* (a small/landscape
+  // browser window, dev tools open, etc.) has the identical problem in the
+  // other axis - content taller than the space centers into overflowing
+  // both up and down, pushing the hero up behind the header above it.
+  // flexGrow: 1 keeps the centering when there's room to spare; when there
+  // isn't, this scrolls instead of overflowing into the header.
+  //
+  // The ScrollView itself also needs style={flex:1} (not just
+  // contentContainerStyle) to bound itself within its flex:1 parent -
+  // the exact same lesson as the FlatList-without-flex:1 bug on the Plan
+  // screen: without it, a ScrollView doesn't reliably know its own
+  // available height, which is the whole point of adding one here.
+  scroll: {
     flex: 1,
+    width: "100%",
+  },
+  container: {
+    flexGrow: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: Spacing.four,
+    paddingVertical: Spacing.four,
   },
   // Caps the whole empty-state column at a phone-ish width regardless of how
   // wide the actual page content area is. Without this, the hero's
   // width:'100%' + aspectRatio:1 scales with the page's own (up to 800px)
-  // content width on desktop/web - a ~700px-tall square, vertically centered
-  // in a column that's shorter than that, overflows both up and down and
-  // ends up rendered behind the header above it.
+  // content width on desktop/web - a ~700px-tall square.
   content: {
     width: "100%",
     maxWidth: 420,

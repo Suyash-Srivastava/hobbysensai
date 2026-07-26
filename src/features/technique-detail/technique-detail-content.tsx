@@ -8,15 +8,17 @@ import { RESOURCE_TYPE_ACTION_LABEL, RESOURCE_TYPE_ICON, RESOURCE_TYPE_LABEL } f
 import { searchUrlFor } from "./search-url";
 
 const STATUS_OPTIONS: { value: TechniqueStatus; label: string }[] = [
-  { value: "learning", label: "Learning" },
-  { value: "mastered", label: "Mastered" },
+  { value: "learning", label: "In Progress" },
+  { value: "mastered", label: "Completed" },
   { value: "skipped", label: "Skip" },
 ];
 
-// "Learning" and "skipped" stay neutral status tones; "mastered" adopts the
-// hobby's own identity color, since that's the state worth celebrating.
-const LEARNING_COLOR = "#f5a524";
-const SKIPPED_COLOR = "#71717a";
+// Universal status-color convention rather than the hobby's own identity
+// color - green/yellow/muted-blue reads as done/in-progress/skipped at a
+// glance regardless of which hobby's color theme is active.
+const IN_PROGRESS_COLOR = "#eab308";
+const COMPLETED_COLOR = "#22c55e";
+const SKIPPED_COLOR = "#64748b";
 
 interface TechniqueDetailContentProps {
   technique: Technique;
@@ -80,7 +82,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
       <View style={[styles.statusRow, { borderTopColor: theme.border }]}>
         {STATUS_OPTIONS.map((option) => {
           const selected = technique.status === option.value;
-          const optionColor = option.value === "mastered" ? categoryColor : option.value === "learning" ? LEARNING_COLOR : SKIPPED_COLOR;
+          const optionColor = option.value === "mastered" ? COMPLETED_COLOR : option.value === "learning" ? IN_PROGRESS_COLOR : SKIPPED_COLOR;
           return (
             <Pressable
               key={option.value}
@@ -93,7 +95,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
                 selected && { backgroundColor: optionColor },
               ]}
             >
-              <ThemedText type="eyebrow" style={[styles.statusLabel, { color: optionColor }, selected && { color: theme.accentText }]}>
+              <ThemedText type="eyebrow" numberOfLines={1} style={[styles.statusLabel, { color: optionColor }, selected && { color: theme.accentText }]}>
                 {option.label}
               </ThemedText>
             </Pressable>
@@ -170,10 +172,17 @@ const styles = StyleSheet.create({
     // control (a 3-way state switch) rather than more filter chips.
     borderRadius: 6,
     borderWidth: 1.5,
+    paddingHorizontal: Spacing.half,
     alignItems: "center",
     justifyContent: "center",
   },
   statusLabel: {
+    // "In Progress" is noticeably longer than "Completed"/"Skip" and these
+    // three pills split the row width evenly - a smaller size/letter-spacing
+    // than the default eyebrow style keeps all three on one line instead of
+    // "In Progress" alone wrapping to two.
+    fontSize: 10,
+    letterSpacing: 0.4,
     includeFontPadding: false,
     textAlignVertical: "center",
   },

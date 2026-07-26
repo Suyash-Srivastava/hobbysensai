@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ExternalLink } from "@/components/external-link";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
@@ -82,9 +82,12 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
                 selected && { backgroundColor: selectedColor, borderColor: selectedColor },
               ]}
             >
-              <ThemedText type="eyebrow" style={selected && { color: theme.accentText }}>
-                {option.icon} {option.label}
-              </ThemedText>
+              <View style={styles.statusPillInner}>
+                <Text style={styles.statusIcon}>{option.icon}</Text>
+                <ThemedText type="eyebrow" style={selected && { color: theme.accentText }}>
+                  {option.label}
+                </ThemedText>
+              </View>
             </Pressable>
           );
         })}
@@ -153,15 +156,23 @@ const styles = StyleSheet.create({
   },
   statusPill: {
     flex: 1,
-    // Fixed height rather than just vertical padding - see the matching
-    // comment on resource-filter-tabs' tab style for why: Android's emoji
-    // font fallback (for the icons in these labels) can render taller than
-    // the text's lineHeight and bulge an auto-sized Pressable unevenly.
     height: 44,
     borderRadius: Spacing.three,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
+  },
+  statusPillInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.one,
+  },
+  // Deliberately no custom fontFamily override here - mixing an emoji glyph
+  // with a custom font in the same Text node makes Android mis-measure the
+  // line height on first paint (see the matching comment in
+  // resource-filter-tabs.tsx), which squished this pill's content until the
+  // next layout pass. A plain Text with the system default font sidesteps it.
+  statusIcon: {
+    fontSize: 12,
   },
 });

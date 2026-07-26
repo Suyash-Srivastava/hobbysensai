@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
@@ -28,9 +28,9 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
   // Nothing to filter if every technique is the same single resource type.
   if (presentTypes.length < 2) return null;
 
-  const tabs: { value: ResourceFilter; label: string }[] = [
+  const tabs: { value: ResourceFilter; icon?: string; label: string }[] = [
     { value: "all", label: "All" },
-    ...presentTypes.map((type) => ({ value: type, label: `${RESOURCE_TYPE_ICON[type]} ${RESOURCE_TYPE_LABEL[type]}` })),
+    ...presentTypes.map((type) => ({ value: type, icon: RESOURCE_TYPE_ICON[type], label: RESOURCE_TYPE_LABEL[type] })),
   ];
 
   return (
@@ -54,9 +54,12 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
               selected && { backgroundColor: categoryColor, borderColor: categoryColor },
             ]}
           >
-            <ThemedText type="small" style={selected && { color: theme.accentText }}>
-              {tab.label}
-            </ThemedText>
+            <View style={styles.tabInner}>
+              {tab.icon ? <Text style={styles.icon}>{tab.icon}</Text> : null}
+              <ThemedText type="small" style={selected && { color: theme.accentText }}>
+                {tab.label}
+              </ThemedText>
+            </View>
           </Pressable>
         );
       })}
@@ -74,17 +77,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   tab: {
-    // Fixed height (not just vertical padding) so a tab's pill shape can't
-    // be inflated by content - Android substitutes a system emoji font for
-    // glyphs like the TV/weight-lifter icons that Inter doesn't cover, and
-    // that fallback font can render taller than the text's own lineHeight,
-    // which would otherwise make only the emoji tabs look taller than "All".
     height: 34,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.five,
     borderWidth: 1,
     alignItems: "center",
     justifyContent: "center",
-    overflow: "hidden",
+  },
+  tabInner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.one,
+  },
+  // Deliberately no custom fontFamily override here (unlike ThemedText) -
+  // mixing an emoji glyph with a custom font in the same Text node makes
+  // Android mis-measure the line height on first paint (it only corrects
+  // itself on the next layout pass, e.g. when a tab gets selected), which
+  // visually squished the pill's content. Rendering the icon in its own
+  // plain Text with the system default font sidesteps that entirely.
+  icon: {
+    fontSize: 14,
   },
 });

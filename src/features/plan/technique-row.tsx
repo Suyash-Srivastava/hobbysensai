@@ -11,7 +11,7 @@ import { STATUS_COLOR } from "./technique-status";
 // and "passed on" (skipped).
 const STATUS_ICON: Record<TechniqueStatus, string> = {
   "not-started": "",
-  learning: "◐",
+  learning: "↻",
   mastered: "✓",
   skipped: "»",
 };
@@ -87,9 +87,7 @@ const styles = StyleSheet.create({
   badge: {
     width: 32,
     height: 32,
-    // Square - matches the status pills in the technique-detail sheet,
-    // rather than the fully round badge shape used before.
-    borderRadius: 6,
+    borderRadius: 16,
     borderWidth: 1.5,
     alignItems: "center",
     justifyContent: "center",

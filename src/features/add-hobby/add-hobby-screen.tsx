@@ -8,7 +8,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button } from "@/components/button";
 import { useTheme } from "@/hooks/use-theme";
-import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
+import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { fetchLearningPlan } from "@/lib/api/learningPlanClient";
 import { generateId } from "@/lib/id";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
@@ -75,68 +75,60 @@ export function AddHobbyScreen() {
       >
         {/* Top inset is already handled by the native header (headerShown: true in _layout.tsx). */}
         <View style={[styles.formContent, { paddingBottom: Math.max(insets.bottom, Spacing.four) }]}>
-          <ThemedView type="backgroundElement" style={[styles.card, { borderColor: theme.border }]}>
-            <ThemedText type="smallBold" style={styles.cardTitle}>
-              Hobby Basics
-            </ThemedText>
-            <FormField
-              label="What are you learning?"
-              placeholder="e.g. chess, acoustic guitar, watercolor painting"
-              value={hobby}
-              onChangeText={setHobby}
-              error={fieldErrors.hobby}
-              required
-              editable={!mutation.isPending}
-            />
-            <View style={styles.field}>
-              <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-                Your Level
-              </ThemedText>
-              <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
-            </View>
-          </ThemedView>
+          <FormField
+            label="What are you learning?"
+            placeholder="e.g. chess, acoustic guitar, watercolor painting"
+            value={hobby}
+            onChangeText={setHobby}
+            error={fieldErrors.hobby}
+            required
+            editable={!mutation.isPending}
+          />
 
-          <ThemedView type="backgroundElement" style={[styles.card, { borderColor: theme.border }]}>
-            <ThemedText type="smallBold" style={styles.cardTitle}>
-              Goal &amp; Pace
+          <View style={styles.field}>
+            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+              Your Level
             </ThemedText>
-            <FormField
-              label="Main Goal"
-              placeholder="e.g. play my first jazz solo"
-              value={goal}
-              onChangeText={setGoal}
-              error={fieldErrors.goal}
-              required
-              editable={!mutation.isPending}
-              multiline
-            />
-            <View style={styles.field}>
-              <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-                Weekly Budget
+            <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
+          </View>
+
+          <FormField
+            label="Main Goal"
+            placeholder="e.g. play my first jazz solo"
+            value={goal}
+            onChangeText={setGoal}
+            error={fieldErrors.goal}
+            required
+            editable={!mutation.isPending}
+            multiline
+          />
+
+          <View style={styles.field}>
+            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+              Weekly Budget
+            </ThemedText>
+            <View style={styles.sliderRow}>
+              <ThemedText type="title" style={styles.sliderValue}>
+                {weeklyTimeBudgetHours}
               </ThemedText>
-              <View style={styles.sliderRow}>
-                <ThemedText type="title" style={styles.sliderValue}>
-                  {weeklyTimeBudgetHours}
-                </ThemedText>
-                <ThemedText type="small" themeColor="textSecondary">
-                  hours / week
-                </ThemedText>
-              </View>
-              <Slider
-                testID="weekly-budget-slider"
-                style={styles.slider}
-                minimumValue={1}
-                maximumValue={20}
-                step={1}
-                value={weeklyTimeBudgetHours}
-                onValueChange={setWeeklyTimeBudgetHours}
-                disabled={mutation.isPending}
-                minimumTrackTintColor={theme.accent}
-                maximumTrackTintColor={theme.border}
-                thumbTintColor={theme.accent}
-              />
+              <ThemedText type="small" themeColor="textSecondary">
+                hours / week
+              </ThemedText>
             </View>
-          </ThemedView>
+            <Slider
+              testID="weekly-budget-slider"
+              style={styles.slider}
+              minimumValue={1}
+              maximumValue={20}
+              step={1}
+              value={weeklyTimeBudgetHours}
+              onValueChange={setWeeklyTimeBudgetHours}
+              disabled={mutation.isPending}
+              minimumTrackTintColor={theme.accent}
+              maximumTrackTintColor={theme.border}
+              thumbTintColor={theme.accent}
+            />
+          </View>
 
           {mutation.isError ? (
             <ThemedText type="small" style={{ color: theme.error }}>
@@ -168,23 +160,8 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: MaxContentWidth,
     paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.two,
-    gap: Spacing.two,
-  },
-  // Grouped as elevated cards - matching the same card language already
-  // used for hobby cards and technique rows elsewhere in the app - rather
-  // than hairline dividers between every field, which read as too busy at
-  // this density. Padding/gap kept tighter than that card pattern usually
-  // uses, since this screen deliberately doesn't scroll.
-  card: {
-    borderRadius: Spacing.four,
-    borderWidth: 1,
-    padding: Spacing.two,
-    gap: Spacing.two,
-    boxShadow: Shadow.card,
-  },
-  cardTitle: {
-    fontSize: 15,
+    paddingTop: Spacing.three,
+    gap: Spacing.three,
   },
   field: { gap: Spacing.one },
   sliderRow: {

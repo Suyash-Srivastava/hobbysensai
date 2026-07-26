@@ -72,7 +72,6 @@ export const Fonts = {
   title: 'Inter_700Bold',
   semibold: 'Inter_600SemiBold',
   medium: 'Inter_500Medium',
-  body: 'Inter_400Regular',
   label: 'JetBrainsMono_600SemiBold',
   labelMedium: 'JetBrainsMono_500Medium',
 };

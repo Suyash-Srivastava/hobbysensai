@@ -9,10 +9,10 @@ import { ThemedView } from "@/components/themed-view";
 import { Button } from "@/components/button";
 import { useTheme } from "@/hooks/use-theme";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
-import { fetchLearningPlan } from "@/lib/api/learningPlanClient";
+import { fetchLearningPlan, LearningPlanRequestError } from "@/lib/api/learningPlanClient";
 import { generateId } from "@/lib/id";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
-import { learningPlanRequestSchema, type HobbyLevel, type HobbyPlan } from "@/shared/hobbyPlan.schema";
+import { EMPTY_STREAK, learningPlanRequestSchema, type HobbyLevel, type HobbyPlan } from "@/shared/hobbyPlan.schema";
 import { LevelSelector } from "./level-selector";
 import { FormField } from "./form-field";
 
@@ -48,22 +48,33 @@ export function AddHobbyScreen() {
     }
     setFieldErrors({});
 
-    const response = await mutation.mutateAsync(parsed.data);
+    try {
+      const response = await mutation.mutateAsync(parsed.data);
 
-    const plan: HobbyPlan = {
-      id: generateId(),
-      ...parsed.data,
-      hobbyCategory: response.hobbyCategory,
-      createdAt: new Date().toISOString(),
-      techniques: response.techniques.map((technique) => ({
-        ...technique,
+      const plan: HobbyPlan = {
         id: generateId(),
-        status: "not-started" as const,
-      })),
-    };
+        ...parsed.data,
+        hobbyCategory: response.hobbyCategory,
+        createdAt: new Date().toISOString(),
+        techniques: response.techniques.map((technique) => ({
+          ...technique,
+          id: generateId(),
+          status: "not-started" as const,
+        })),
+        streak: EMPTY_STREAK,
+      };
 
-    await addPlan(plan);
-    router.replace(`/plan/${plan.id}`);
+      await addPlan(plan);
+      router.replace(`/plan/${plan.id}`);
+    } catch (error) {
+      // The AI itself decided "hobby" isn't a real, recognizable hobby (see
+      // promptBuilder's recognized:false path) - point at the specific
+      // field instead of just a generic bottom-of-form error, since this is
+      // something the user needs to fix, not a transient failure to retry.
+      if (error instanceof LearningPlanRequestError && error.code === "hobby_not_recognized") {
+        setFieldErrors({ hobby: error.message });
+      }
+    }
   };
 
   return (
@@ -126,7 +137,10 @@ export function AddHobbyScreen() {
             />
           </View>
 
-          {mutation.isError ? (
+          {/* "Not a recognized hobby" points at the hobby field itself
+              (fieldErrors.hobby, set in the catch above) instead of
+              duplicating the same message down here too. */}
+          {mutation.isError && !(mutation.error instanceof LearningPlanRequestError && mutation.error.code === "hobby_not_recognized") ? (
             <View
               accessibilityLiveRegion="assertive"
               style={[styles.statusBox, { backgroundColor: `${theme.error}1A`, borderColor: theme.error }]}

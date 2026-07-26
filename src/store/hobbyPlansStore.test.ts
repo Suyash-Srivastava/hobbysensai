@@ -10,6 +10,7 @@ function makePlan(id: string): HobbyPlan {
     weeklyTimeBudgetHours: 3,
     hobbyCategory: "strategy-game",
     createdAt: "2026-01-01T00:00:00.000Z",
+    streak: { count: 0, lastActiveDate: null },
     techniques: [
       { id: `${id}-t1`, title: "A", rationale: "Some rationale text here.", resourceType: "article", searchQuery: "q", estimatedHours: 1, order: 1, status: "not-started" },
       { id: `${id}-t2`, title: "B", rationale: "Some rationale text here.", resourceType: "article", searchQuery: "q", estimatedHours: 1, order: 2, status: "not-started" },
@@ -18,7 +19,7 @@ function makePlan(id: string): HobbyPlan {
 }
 
 beforeEach(() => {
-  useHobbyPlansStore.setState({ plans: [], streak: { count: 0, lastActiveDate: null }, hydrated: false });
+  useHobbyPlansStore.setState({ plans: [], hydrated: false });
 });
 
 test("setTechniqueStatus updates only the targeted technique on the targeted plan", async () => {
@@ -46,13 +47,17 @@ test("addPlan appends without disturbing existing plans, removePlan removes only
   expect(useHobbyPlansStore.getState().plans.map((p) => p.id)).toEqual(["b"]);
 });
 
-test("marking a technique mastered advances the streak, skipping one does not", async () => {
+test("marking a technique mastered advances that hobby's own streak, skipping one does not, and other hobbies are untouched", async () => {
   const planA = makePlan("a");
-  useHobbyPlansStore.setState({ plans: [planA] });
+  const planB = makePlan("b");
+  useHobbyPlansStore.setState({ plans: [planA, planB] });
 
   await useHobbyPlansStore.getState().setTechniqueStatus("a", "a-t1", "mastered");
-  expect(useHobbyPlansStore.getState().streak.count).toBe(1);
+  const afterMaster = useHobbyPlansStore.getState().plans;
+  expect(afterMaster.find((p) => p.id === "a")?.streak.count).toBe(1);
+  // A different hobby's streak must not move just because this one did.
+  expect(afterMaster.find((p) => p.id === "b")?.streak.count).toBe(0);
 
   await useHobbyPlansStore.getState().setTechniqueStatus("a", "a-t2", "skipped");
-  expect(useHobbyPlansStore.getState().streak.count).toBe(1);
+  expect(useHobbyPlansStore.getState().plans.find((p) => p.id === "a")?.streak.count).toBe(1);
 });

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { learningPlanRequestSchema } from "../src/shared/hobbyPlan.schema";
-import { generateLearningPlan, LearningPlanGenerationError } from "./_lib/services/learningPlan.service";
+import { generateLearningPlan, HobbyNotRecognizedError, LearningPlanGenerationError } from "./_lib/services/learningPlan.service";
 import { getAIProvider } from "./_lib/providers/ai/factory";
 import { isRateLimited } from "./_lib/middleware/rateLimit";
 import { applyCors } from "./_lib/middleware/cors";
@@ -39,6 +39,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { plan, cached } = await generateLearningPlan(getAIProvider(), parsedRequest.data);
     res.status(200).json({ plan, cached });
   } catch (error) {
+    if (error instanceof HobbyNotRecognizedError) {
+      res.status(422).json({ error: error.message, code: "hobby_not_recognized" });
+      return;
+    }
     if (error instanceof LearningPlanGenerationError) {
       logger.error({ error: error.message }, "learning plan generation failed after repair retry");
       res.status(502).json({ error: "The AI provider could not produce a valid learning plan. Please try again." });

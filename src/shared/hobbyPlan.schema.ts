@@ -69,12 +69,29 @@ export const techniqueCoreSchema = z.object({
 });
 export type TechniqueCore = z.infer<typeof techniqueCoreSchema>;
 
-/** Full shape the LLM must return for one generation call. */
+/** What a successful generation looks like - what the API returns to the client. */
 export const learningPlanResponseSchema = z.object({
   hobbyCategory: hobbyCategorySchema,
   techniques: z.array(techniqueCoreSchema).min(5).max(8),
 });
 export type LearningPlanResponse = z.infer<typeof learningPlanResponseSchema>;
+
+/**
+ * The LLM's raw output can also be a rejection - "das43" or "asdkjfh" isn't
+ * a hobby, and generating a confident 5-8 step curriculum for gibberish
+ * anyway is worse than admitting it doesn't recognize the input. This union
+ * is what the model is actually constrained to (see buildSystemInstruction);
+ * the plain success schema above is what the rest of the app sees once the
+ * service layer has resolved this into either a plan or a thrown error.
+ */
+export const learningPlanModelOutputSchema = z.discriminatedUnion("recognized", [
+  learningPlanResponseSchema.extend({ recognized: z.literal(true) }),
+  z.object({
+    recognized: z.literal(false),
+    reason: z.string().trim().min(5).max(200),
+  }),
+]);
+export type LearningPlanModelOutput = z.infer<typeof learningPlanModelOutputSchema>;
 
 /** One technique as persisted on-device, with local-only fields added. */
 export const techniqueSchema = techniqueCoreSchema.extend({
@@ -83,26 +100,33 @@ export const techniqueSchema = techniqueCoreSchema.extend({
 });
 export type Technique = z.infer<typeof techniqueSchema>;
 
-/** A full hobby track as persisted on-device. */
-export const hobbyPlanSchema = learningPlanRequestSchema.extend({
-  id: z.string(),
-  createdAt: z.string(),
-  hobbyCategory: hobbyCategorySchema,
-  techniques: z.array(techniqueSchema),
-});
-export type HobbyPlan = z.infer<typeof hobbyPlanSchema>;
-
 export const streakSchema = z.object({
   count: z.number().int().min(0),
   lastActiveDate: z.string().nullable(), // YYYY-MM-DD, local calendar day
 });
 export type Streak = z.infer<typeof streakSchema>;
 
+export const EMPTY_STREAK: Streak = { count: 0, lastActiveDate: null };
+
+/**
+ * A full hobby track as persisted on-device. The streak lives here (per
+ * hobby), not on the top-level state - each hobby is its own habit with its
+ * own consecutive-days count, not one shared "did you use the app today"
+ * number across every hobby.
+ */
+export const hobbyPlanSchema = learningPlanRequestSchema.extend({
+  id: z.string(),
+  createdAt: z.string(),
+  hobbyCategory: hobbyCategorySchema,
+  techniques: z.array(techniqueSchema),
+  streak: streakSchema,
+});
+export type HobbyPlan = z.infer<typeof hobbyPlanSchema>;
+
 /** Top-level shape of the persisted AsyncStorage blob. */
 export const hobbyPlansStateSchema = z.object({
-  version: z.literal(1),
+  version: z.literal(2),
   plans: z.array(hobbyPlanSchema),
-  streak: streakSchema,
 });
 export type HobbyPlansState = z.infer<typeof hobbyPlansStateSchema>;
 
@@ -113,9 +137,10 @@ function toCalendarDay(date: Date): string {
 }
 
 /**
- * Advances the app-wide streak given a "the learner engaged today" event.
- * Same day: unchanged. Exactly one calendar day after the last activity:
- * +1. Any bigger gap (or first-ever activity): resets to 1.
+ * Advances a single hobby's streak given a "the learner engaged with this
+ * hobby today" event. Same day: unchanged. Exactly one calendar day after
+ * the last activity: +1. Any bigger gap (or first-ever activity): resets
+ * to 1.
  */
 export function advanceStreak(streak: Streak, now: Date = new Date()): Streak {
   const today = toCalendarDay(now);

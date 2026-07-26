@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  learningPlanResponseSchema,
+  learningPlanModelOutputSchema,
   RESOURCE_TYPES_BY_CATEGORY,
   type LearningPlanRequest,
   type LearningPlanResponse,
@@ -12,13 +12,19 @@ import { logger } from "../logger";
 
 export class LearningPlanGenerationError extends Error {}
 
+/** The model looked at the input and decided it isn't a real, learnable hobby. */
+export class HobbyNotRecognizedError extends Error {}
+
 // Gemini's structured-output subset doesn't include every JSON Schema
 // keyword (e.g. no $schema) - strip what it doesn't recognize rather than
 // risk the request being rejected outright.
-const { $schema: _omit, ...responseJsonSchema } = z.toJSONSchema(learningPlanResponseSchema) as Record<string, unknown>;
+const { $schema: _omit, ...responseJsonSchema } = z.toJSONSchema(learningPlanModelOutputSchema) as Record<
+  string,
+  unknown
+>;
 
 type ParseResult =
-  | { success: true; data: LearningPlanResponse }
+  | { success: true; data: z.infer<typeof learningPlanModelOutputSchema> }
   | { success: false; error: string };
 
 function parseModelOutput(raw: string): ParseResult {
@@ -28,7 +34,7 @@ function parseModelOutput(raw: string): ParseResult {
   } catch {
     return { success: false, error: "Response was not valid JSON" };
   }
-  const result = learningPlanResponseSchema.safeParse(parsedJson);
+  const result = learningPlanModelOutputSchema.safeParse(parsedJson);
   if (!result.success) {
     return { success: false, error: result.error.message };
   }
@@ -93,7 +99,13 @@ export async function generateLearningPlan(
     );
   }
 
-  const guarded = enforceResourceTypeGuardrail(parsed.data);
+  if (!parsed.data.recognized) {
+    logger.info({ provider: provider.name, hobby: request.hobby, reason: parsed.data.reason }, "hobby not recognized");
+    throw new HobbyNotRecognizedError(parsed.data.reason);
+  }
+
+  const { hobbyCategory, techniques } = parsed.data;
+  const guarded = enforceResourceTypeGuardrail({ hobbyCategory, techniques });
   setCached(key, guarded);
   logger.info({ provider: provider.name, hobby: request.hobby, techniques: guarded.techniques.length }, "learning plan generated");
   return { plan: guarded, cached: false };

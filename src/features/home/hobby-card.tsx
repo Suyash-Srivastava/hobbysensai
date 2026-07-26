@@ -11,10 +11,9 @@ import { HOBBY_CATEGORY_LABEL, hobbyCategoryColor } from "./hobby-category-icon"
 interface HobbyCardProps {
   plan: HobbyPlan;
   isContinue: boolean;
-  streakCount: number;
 }
 
-export function HobbyCard({ plan, isContinue, streakCount }: HobbyCardProps) {
+export function HobbyCard({ plan, isContinue }: HobbyCardProps) {
   const theme = useTheme();
   const scheme = useColorScheme() === "dark" ? "dark" : "light";
   const { mastered, total, percent } = hobbyProgress(plan);
@@ -55,10 +54,10 @@ export function HobbyCard({ plan, isContinue, streakCount }: HobbyCardProps) {
           {HOBBY_CATEGORY_LABEL[plan.hobbyCategory]}
         </ThemedText>
 
-        {isContinue && streakCount > 0 ? (
+        {plan.streak.count > 0 ? (
           <View style={[styles.streakPill, { backgroundColor: `${categoryColor}22` }]}>
             <ThemedText type="small" style={{ color: categoryColor }}>
-              🔥 {streakCount}-day streak
+              🔥 {plan.streak.count}-day streak
             </ThemedText>
           </View>
         ) : null}

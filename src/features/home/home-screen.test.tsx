@@ -33,6 +33,7 @@ function makePlan(id: string, hobby: string): HobbyPlan {
     weeklyTimeBudgetHours: 3,
     hobbyCategory: "strategy-game",
     createdAt: "2026-01-01T00:00:00.000Z",
+    streak: { count: 0, lastActiveDate: null },
     techniques: [
       {
         id: `${id}-t1`,
@@ -62,7 +63,6 @@ beforeEach(() => {
   jest.clearAllMocks();
   useHobbyPlansStore.setState({
     plans: [],
-    streak: { count: 0, lastActiveDate: null },
     lastActiveHobbyId: null,
     hydrated: true,
   });

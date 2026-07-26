@@ -1,4 +1,4 @@
-import { generateLearningPlan, LearningPlanGenerationError } from "./learningPlan.service";
+import { generateLearningPlan, HobbyNotRecognizedError, LearningPlanGenerationError } from "./learningPlan.service";
 import { clearCacheForTests } from "../cache/planCache";
 import type { AIProvider } from "../providers/ai/AIProvider";
 import type { LearningPlanRequest, LearningPlanResponse } from "../../../src/shared/hobbyPlan.schema";
@@ -26,7 +26,8 @@ function baseRequest(overrides: Partial<LearningPlanRequest> = {}): LearningPlan
 }
 
 function validPlanJson(overrides: Partial<LearningPlanResponse> = {}): string {
-  const plan: LearningPlanResponse = {
+  const plan: LearningPlanResponse & { recognized: true } = {
+    recognized: true,
     hobbyCategory: "strategy-game",
     techniques: [
       { title: "Opening principles", rationale: "Control the center early to avoid a cramped position.", resourceType: "article", searchQuery: "chess opening principles beginner", estimatedHours: 2, order: 1 },
@@ -38,6 +39,10 @@ function validPlanJson(overrides: Partial<LearningPlanResponse> = {}): string {
     ...overrides,
   };
   return JSON.stringify(plan);
+}
+
+function notRecognizedJson(reason: string): string {
+  return JSON.stringify({ recognized: false, reason });
 }
 
 beforeEach(() => {
@@ -83,4 +88,13 @@ test("a resourceType mismatched to the hobby category is coerced to an allowed t
 
   expect(plan.techniques[0].resourceType).not.toBe("video");
   expect(["article", "diagram", "interactive", "drill"]).toContain(plan.techniques[0].resourceType);
+});
+
+test("a nonsense hobby is rejected with the model's own reason, without ever producing a plan", async () => {
+  const provider = fakeProvider([notRecognizedJson("'das43' doesn't look like a real hobby - try something specific like chess, pottery, or guitar.")]);
+
+  await expect(generateLearningPlan(provider, baseRequest({ hobby: "das43" }))).rejects.toBeInstanceOf(
+    HobbyNotRecognizedError,
+  );
+  await expect(generateLearningPlan(provider, baseRequest({ hobby: "das43" }))).rejects.toThrow(/das43/);
 });

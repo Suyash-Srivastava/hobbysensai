@@ -19,6 +19,7 @@ import { JetBrainsMono_600SemiBold } from "@expo-google-fonts/jetbrains-mono/600
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { LearningPlanRequestError } from "@/lib/api/learningPlanClient";
 import { Colors, Fonts } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -28,8 +29,13 @@ const queryClient = new QueryClient({
     mutations: {
       // Gemini's free tier is rate-limited; retry transient failures a
       // couple of times with backoff instead of failing the whole
-      // plan-generation flow on one hiccup.
-      retry: 2,
+      // plan-generation flow on one hiccup. But "hobby not recognized" is a
+      // deterministic rejection, not a transient one - retrying it can't
+      // ever succeed, and would just burn 2 extra AI calls (and make the
+      // user wait through 2 pointless retries) before showing the error
+      // they need to act on.
+      retry: (failureCount, error) =>
+        error instanceof LearningPlanRequestError && error.code === "hobby_not_recognized" ? false : failureCount < 2,
       retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 5000),
     },
   },

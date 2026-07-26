@@ -12,7 +12,6 @@ import { EmptyState } from "./empty-state";
 
 export function HomeScreen() {
   const plans = useHobbyPlansStore((state) => state.plans);
-  const streak = useHobbyPlansStore((state) => state.streak);
   const lastActiveHobbyId = useHobbyPlansStore((state) => state.lastActiveHobbyId);
   // useSafeAreaInsets (a hook) rather than <SafeAreaView> (a component) -
   // more reliable when nested inside react-native-screens' native stack,
@@ -37,9 +36,7 @@ export function HomeScreen() {
               data={plans}
               keyExtractor={(plan) => plan.id}
               contentContainerStyle={styles.list}
-              renderItem={({ item }) => (
-                <HobbyCard plan={item} isContinue={item.id === lastActiveHobbyId} streakCount={streak.count} />
-              )}
+              renderItem={({ item }) => <HobbyCard plan={item} isContinue={item.id === lastActiveHobbyId} />}
             />
             <Button
               label="Add a hobby"

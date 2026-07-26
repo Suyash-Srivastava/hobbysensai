@@ -11,7 +11,8 @@ jest.mock("./_lib/providers/ai/factory", () => ({
 import { getAIProvider } from "./_lib/providers/ai/factory";
 import handler from "./learning-plan";
 
-const validPlan: LearningPlanResponse = {
+const validPlan: LearningPlanResponse & { recognized: true } = {
+  recognized: true,
   hobbyCategory: "musical",
   techniques: [
     { title: "Basic chords", rationale: "Open chords let you play hundreds of songs immediately.", resourceType: "video", searchQuery: "guitar open chords beginner", estimatedHours: 3, order: 1 },
@@ -53,6 +54,28 @@ test("a valid request returns 200 with a schema-valid plan", async () => {
   expect(res._getStatusCode()).toBe(200);
   const data = res._getJSONData() as { plan: LearningPlanResponse };
   expect(data.plan.techniques).toHaveLength(5);
+});
+
+test("a nonsense hobby name is rejected with a 422 and a hobby_not_recognized code", async () => {
+  jest.mocked(getAIProvider).mockReturnValue({
+    name: "mock-provider",
+    generateJson: jest.fn(async () =>
+      JSON.stringify({ recognized: false, reason: "'das43' doesn't look like a real hobby - try chess, pottery, or guitar." }),
+    ),
+  });
+  const { req, res } = mockRequestResponse({
+    hobby: "das43",
+    currentLevel: "beginner",
+    goal: "learn it",
+    weeklyTimeBudgetHours: 4,
+  });
+
+  await handler(req, res);
+
+  expect(res._getStatusCode()).toBe(422);
+  const data = res._getJSONData() as { error: string; code: string };
+  expect(data.code).toBe("hobby_not_recognized");
+  expect(data.error).toMatch(/das43/);
 });
 
 test("an invalid request body returns 400 and never calls the AI provider", async () => {

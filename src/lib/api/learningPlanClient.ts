@@ -13,6 +13,20 @@ const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL ?? "";
 
 interface ErrorBody {
   error?: string;
+  code?: string;
+}
+
+/** Thrown for a non-ok /api/learning-plan response - carries the backend's
+ * error `code` (e.g. "hobby_not_recognized") so the UI can react to specific
+ * failure kinds instead of only showing a generic message. */
+export class LearningPlanRequestError extends Error {
+  code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.name = "LearningPlanRequestError";
+    this.code = code;
+  }
 }
 
 export async function fetchLearningPlan(request: LearningPlanRequest): Promise<LearningPlanResponse> {
@@ -26,7 +40,7 @@ export async function fetchLearningPlan(request: LearningPlanRequest): Promise<L
 
   if (!response.ok) {
     const body: ErrorBody = await response.json().catch(() => ({}));
-    throw new Error(body.error ?? `Request failed with status ${response.status}`);
+    throw new LearningPlanRequestError(body.error ?? `Request failed with status ${response.status}`, body.code);
   }
 
   const body = await response.json();

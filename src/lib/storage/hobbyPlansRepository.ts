@@ -2,17 +2,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { hobbyPlansStateSchema, type HobbyPlansState } from "../../shared/hobbyPlan.schema";
 
 const STORAGE_KEY = "hobbysensai:hobby-plans";
-const CURRENT_VERSION = 1 as const;
+// v2: streak moved from top-level (one app-wide streak) to per-plan (each
+// hobby tracks its own). A v1 blob fails validation against the v2 schema
+// and falls back to EMPTY_STATE below, same as any other corrupted/outdated
+// shape - by design, not a bug (see parseStoredState).
+const CURRENT_VERSION = 2 as const;
 
 const EMPTY_STATE: HobbyPlansState = {
   version: CURRENT_VERSION,
   plans: [],
-  streak: { count: 0, lastActiveDate: null },
 };
 
 export interface HobbyPlansRepository {
   load(): Promise<HobbyPlansState>;
-  save(state: Pick<HobbyPlansState, "plans" | "streak">): Promise<void>;
+  save(state: Pick<HobbyPlansState, "plans">): Promise<void>;
   clear(): Promise<void>;
 }
 

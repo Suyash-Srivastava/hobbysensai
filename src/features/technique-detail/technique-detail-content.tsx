@@ -4,7 +4,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
-import { RESOURCE_TYPE_ICON, RESOURCE_TYPE_LABEL } from "@/features/plan/resource-type";
+import { RESOURCE_TYPE_ACTION_LABEL, RESOURCE_TYPE_ICON, RESOURCE_TYPE_LABEL } from "@/features/plan/resource-type";
 import { searchUrlFor } from "./search-url";
 
 const STATUS_OPTIONS: { value: TechniqueStatus; label: string; icon: string }[] = [
@@ -61,7 +61,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
 
       <ExternalLink href={searchUrlFor(technique.resourceType, technique.searchQuery)} style={styles.searchLinkWrapper}>
         <View style={[styles.searchLink, { backgroundColor: theme.backgroundSelected }]}>
-          <ThemedText type="smallBold">📖 Find a lesson on this</ThemedText>
+          <ThemedText type="smallBold">{RESOURCE_TYPE_ICON[technique.resourceType]} {RESOURCE_TYPE_ACTION_LABEL[technique.resourceType]}</ThemedText>
           <ThemedText>→</ThemedText>
         </View>
       </ExternalLink>

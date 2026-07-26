@@ -85,7 +85,9 @@ export function AddHobbyScreen() {
               required
               editable={!mutation.isPending}
             />
+          </View>
 
+          <View style={[styles.section, styles.sectionDivider, { borderBottomColor: theme.border }]}>
             <View style={styles.field}>
               <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
                 Your Level
@@ -94,7 +96,7 @@ export function AddHobbyScreen() {
             </View>
           </View>
 
-          <View style={styles.section}>
+          <View style={[styles.section, styles.sectionDivider, { borderBottomColor: theme.border }]}>
             <FormField
               label="Main Goal"
               placeholder="e.g. play my first jazz solo"
@@ -105,7 +107,9 @@ export function AddHobbyScreen() {
               editable={!mutation.isPending}
               multiline
             />
+          </View>
 
+          <View style={styles.section}>
             <View style={styles.field}>
               <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
                 Weekly Budget
@@ -165,16 +169,18 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
-    gap: Spacing.four,
+    gap: Spacing.three,
   },
-  // Groups related fields ("what/level" vs "goal/budget") with a hairline
-  // rule between them instead of one undifferentiated stack of inputs -
-  // matches the hairline-divider look already used elsewhere (e.g. the
-  // technique-detail status row) rather than introducing a boxed-card style.
+  // Each field gets its own section with a hairline rule below it, instead
+  // of one undifferentiated stack of inputs - matches the hairline-divider
+  // look already used elsewhere (e.g. the technique-detail status row)
+  // rather than introducing a boxed-card style. Kept tight (not the
+  // heavier spacing a card treatment would use) since this screen
+  // deliberately doesn't scroll - it all has to fit on one small screen.
   section: { gap: Spacing.three },
   sectionDivider: {
     borderBottomWidth: 1,
-    paddingBottom: Spacing.four,
+    paddingBottom: Spacing.three,
   },
   field: { gap: Spacing.one },
   sliderRow: {

@@ -22,32 +22,34 @@ export function EmptyState() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.heroWrapper}>
-        <EmptyStateHero />
-      </View>
+      <View style={styles.content}>
+        <View style={styles.heroWrapper}>
+          <EmptyStateHero />
+        </View>
 
-      <ThemedText type="title" style={styles.headline}>
-        The first step is the hardest.
-      </ThemedText>
-      <ThemedText type="small" themeColor="textSecondary" style={styles.subhead}>
-        No hobbies yet. What would you like to master today?
-      </ThemedText>
+        <ThemedText type="title" style={styles.headline}>
+          The first step is the hardest.
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={styles.subhead}>
+          No hobbies yet. What would you like to master today?
+        </ThemedText>
 
-      <Button label="Add your first hobby" icon="+" onPress={() => router.push("/add-hobby")} style={styles.cta} />
+        <Button label="Add your first hobby" icon="+" onPress={() => router.push("/add-hobby")} style={styles.cta} />
 
-      {/* Display-only category hints, not a second "add hobby" tap target -
-          the button above is the one and only action on this screen. */}
-      <View style={styles.chipsRow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        {SUGGESTED_CATEGORIES.map((category) => {
-          const color = hobbyCategoryColor(category, scheme);
-          return (
-            <View key={category} style={[styles.chip, { borderColor: theme.border }]}>
-              <ThemedText type="small" style={{ color }}>
-                {HOBBY_CATEGORY_LABEL[category]}
-              </ThemedText>
-            </View>
-          );
-        })}
+        {/* Display-only category hints, not a second "add hobby" tap target -
+            the button above is the one and only action on this screen. */}
+        <View style={styles.chipsRow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          {SUGGESTED_CATEGORIES.map((category) => {
+            const color = hobbyCategoryColor(category, scheme);
+            return (
+              <View key={category} style={[styles.chip, { borderColor: theme.border }]}>
+                <ThemedText type="small" style={{ color }}>
+                  {HOBBY_CATEGORY_LABEL[category]}
+                </ThemedText>
+              </View>
+            );
+          })}
+        </View>
       </View>
     </View>
   );
@@ -58,8 +60,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: Spacing.two,
     paddingHorizontal: Spacing.four,
+  },
+  // Caps the whole empty-state column at a phone-ish width regardless of how
+  // wide the actual page content area is. Without this, the hero's
+  // width:'100%' + aspectRatio:1 scales with the page's own (up to 800px)
+  // content width on desktop/web - a ~700px-tall square, vertically centered
+  // in a column that's shorter than that, overflows both up and down and
+  // ends up rendered behind the header above it.
+  content: {
+    width: "100%",
+    maxWidth: 420,
+    alignItems: "center",
+    gap: Spacing.two,
   },
   heroWrapper: {
     width: "100%",

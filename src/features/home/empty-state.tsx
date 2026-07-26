@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, useColorScheme, View } from "react-native";
+import { StyleSheet, useColorScheme, View } from "react-native";
 import { router } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { Button } from "@/components/button";
@@ -35,23 +35,17 @@ export function EmptyState() {
 
       <Button label="Add your first hobby" icon="+" onPress={() => router.push("/add-hobby")} style={styles.cta} />
 
-      <View style={styles.chipsRow}>
+      {/* Display-only category hints, not a second "add hobby" tap target -
+          the button above is the one and only action on this screen. */}
+      <View style={styles.chipsRow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {SUGGESTED_CATEGORIES.map((category) => {
           const color = hobbyCategoryColor(category, scheme);
           return (
-            <Pressable
-              key={category}
-              testID={`category-chip-${category}`}
-              onPress={() => router.push("/add-hobby")}
-              accessibilityRole="button"
-              accessibilityLabel={`Add a ${HOBBY_CATEGORY_LABEL[category]} hobby`}
-              android_ripple={{ color: theme.borderStrong }}
-              style={[styles.chip, { borderColor: theme.border }]}
-            >
+            <View key={category} style={[styles.chip, { borderColor: theme.border }]}>
               <ThemedText type="small" style={{ color }}>
                 {HOBBY_CATEGORY_LABEL[category]}
               </ThemedText>
-            </Pressable>
+            </View>
           );
         })}
       </View>

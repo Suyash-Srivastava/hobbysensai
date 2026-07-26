@@ -86,9 +86,7 @@ export function AddHobbyScreen() {
           />
 
           <View style={styles.field}>
-            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-              Your Level
-            </ThemedText>
+            <ThemedText type="smallBold">Your Level</ThemedText>
             <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
           </View>
 
@@ -104,9 +102,7 @@ export function AddHobbyScreen() {
           />
 
           <View style={styles.field}>
-            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-              Weekly Budget
-            </ThemedText>
+            <ThemedText type="smallBold">Weekly Budget</ThemedText>
             <View style={styles.sliderRow}>
               <ThemedText type="title" style={styles.sliderValue}>
                 {weeklyTimeBudgetHours}

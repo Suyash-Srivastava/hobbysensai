@@ -14,9 +14,7 @@ export function FormField({ label, error, required, style, ...inputProps }: Form
 
   return (
     <View style={styles.container}>
-      <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-        {label}
-      </ThemedText>
+      <ThemedText type="smallBold">{label}</ThemedText>
       <TextInput
         placeholderTextColor={theme.textSecondary}
         textAlignVertical={inputProps.multiline ? "top" : undefined}

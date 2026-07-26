@@ -13,6 +13,7 @@ import { HOBBY_CATEGORY_EMOJI, hobbyCategoryColor } from "@/features/home/hobby-
 import { TechniqueDetailSheet } from "@/features/technique-detail/technique-detail-sheet";
 import { TechniqueRow } from "./technique-row";
 import { MasteryCelebration } from "./mastery-celebration";
+import { ResourceFilterTabs, type ResourceFilter } from "./resource-filter-tabs";
 
 export function PlanScreen() {
   const { hobbyId } = useLocalSearchParams<{ hobbyId: string }>();
@@ -26,6 +27,7 @@ export function PlanScreen() {
 
   const [selectedTechniqueId, setSelectedTechniqueId] = useState<string | null>(null);
   const [celebrationKey, setCelebrationKey] = useState(0);
+  const [resourceFilter, setResourceFilter] = useState<ResourceFilter>("all");
 
   if (!plan) {
     return (
@@ -48,6 +50,8 @@ export function PlanScreen() {
   const { mastered, total, percent } = hobbyProgress(plan);
   const selectedTechnique = plan.techniques.find((t) => t.id === selectedTechniqueId) ?? null;
   const sortedTechniques = [...plan.techniques].sort((a, b) => a.order - b.order);
+  const visibleTechniques =
+    resourceFilter === "all" ? sortedTechniques : sortedTechniques.filter((t) => t.resourceType === resourceFilter);
 
   const handleChangeStatus = async (status: TechniqueStatus) => {
     if (!selectedTechnique) return;
@@ -105,8 +109,15 @@ export function PlanScreen() {
           Mastery Curriculum
         </ThemedText>
 
+        <ResourceFilterTabs
+          techniques={plan.techniques}
+          activeFilter={resourceFilter}
+          onChangeFilter={setResourceFilter}
+          categoryColor={categoryColor}
+        />
+
         <FlatList<Technique>
-          data={sortedTechniques}
+          data={visibleTechniques}
           keyExtractor={(technique) => technique.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (

@@ -4,15 +4,8 @@ import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
+import { RESOURCE_TYPE_ICON, RESOURCE_TYPE_LABEL } from "@/features/plan/resource-type";
 import { searchUrlFor } from "./search-url";
-
-const RESOURCE_TYPE_LABEL: Record<Technique["resourceType"], string> = {
-  video: "📺 Video resource",
-  article: "📄 Article resource",
-  interactive: "🧩 Interactive resource",
-  drill: "🏋️ Practice drill",
-  diagram: "📊 Diagram / worked examples",
-};
 
 const STATUS_OPTIONS: { value: TechniqueStatus; label: string; icon: string }[] = [
   { value: "learning", label: "Learning", icon: "🔥" },
@@ -53,7 +46,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
       </View>
 
       <ThemedText type="eyebrow" style={{ color: categoryColor }}>
-        {RESOURCE_TYPE_LABEL[technique.resourceType]} · ~{technique.estimatedHours}h
+        {RESOURCE_TYPE_ICON[technique.resourceType]} {RESOURCE_TYPE_LABEL[technique.resourceType]} resource · ~{technique.estimatedHours}h
       </ThemedText>
 
       <View style={styles.rationaleBlock}>

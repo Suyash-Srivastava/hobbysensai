@@ -21,6 +21,8 @@ interface MasteryCelebrationProps {
    * treatment from the app's own current-mode text color.
    */
   textColor: string;
+  /** Safe-area top inset - position:"absolute" ignores an ancestor's padding in RN, so this has to be added directly. */
+  topInset: number;
 }
 
 /**
@@ -28,7 +30,7 @@ interface MasteryCelebrationProps {
  * tiny (no confetti library / particle system) so it reinforces the core
  * checklist loop instead of becoming its own feature.
  */
-export function MasteryCelebration({ triggerKey, color, textColor }: MasteryCelebrationProps) {
+export function MasteryCelebration({ triggerKey, color, textColor, topInset }: MasteryCelebrationProps) {
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -49,7 +51,10 @@ export function MasteryCelebration({ triggerKey, color, textColor }: MasteryCele
   };
 
   return (
-    <Animated.View pointerEvents="none" style={[styles.banner, { backgroundColor: color }, animatedStyle]}>
+    <Animated.View
+      pointerEvents="none"
+      style={[styles.banner, { top: topInset + Spacing.three, backgroundColor: color }, animatedStyle]}
+    >
       <ThemedText style={[styles.text, { color: textColor }]}>🎉 Technique mastered!</ThemedText>
     </Animated.View>
   );
@@ -58,7 +63,6 @@ export function MasteryCelebration({ triggerKey, color, textColor }: MasteryCele
 const styles = StyleSheet.create({
   banner: {
     position: "absolute",
-    top: Spacing.three,
     alignSelf: "center",
     paddingVertical: Spacing.two,
     paddingHorizontal: Spacing.four,

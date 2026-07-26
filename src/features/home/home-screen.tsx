@@ -45,12 +45,17 @@ export function HomeScreen() {
               label="Add a hobby"
               icon="+"
               onPress={() => router.push("/add-hobby")}
-              style={styles.addButton}
+              // position: "absolute" ignores the parent's paddingBottom in
+              // React Native (unlike web CSS) - the inset has to be baked
+              // into "bottom" directly, or this sits underneath the
+              // Android 3-button nav bar / iOS home indicator.
+              style={[styles.addButton, { bottom: insets.bottom + Spacing.four }]}
               testID="add-hobby-button"
             />
           </>
         )}
       </View>
+
     </ThemedView>
   );
 }

@@ -70,7 +70,12 @@ export function PlanScreen() {
           { experimental_backgroundImage: `linear-gradient(180deg, ${categoryColor}3d 0%, transparent 100%)` },
         ]}
       />
-      <MasteryCelebration triggerKey={celebrationKey} color={categoryColor} textColor={categoryTextColor} />
+      <MasteryCelebration
+        triggerKey={celebrationKey}
+        color={categoryColor}
+        textColor={categoryTextColor}
+        topInset={insets.top}
+      />
       <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow}>
           <ThemedText type="link">← Home</ThemedText>

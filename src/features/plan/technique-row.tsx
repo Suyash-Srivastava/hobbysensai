@@ -4,7 +4,11 @@ import { ThemedView } from "@/components/themed-view";
 import { useTheme } from "@/hooks/use-theme";
 import { Shadow, Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
+import { STATUS_COLOR } from "./technique-status";
 
+// "In progress" gets a loading-style glyph rather than a checkmark variant,
+// so its badge reads as "still going" at a glance next to "done" (mastered)
+// and "passed on" (skipped).
 const STATUS_ICON: Record<TechniqueStatus, string> = {
   "not-started": "",
   learning: "◐",
@@ -14,26 +18,29 @@ const STATUS_ICON: Record<TechniqueStatus, string> = {
 
 interface TechniqueRowProps {
   technique: Technique;
-  /** The hobby's identity color - used for the mastered/learning badge instead of the generic app accent. */
-  categoryColor: string;
   onPress: () => void;
 }
 
-export function TechniqueRow({ technique, categoryColor, onPress }: TechniqueRowProps) {
+export function TechniqueRow({ technique, onPress }: TechniqueRowProps) {
   const theme = useTheme();
+  // Only a completed technique reads as "done, no need to look again" - a
+  // skipped one was never finished, so it stays plain rather than crossed
+  // out (which would visually claim it as done).
+  const isCompleted = technique.status === "mastered";
   const isSkipped = technique.status === "skipped";
+
+  const statusColor = technique.status === "not-started" ? undefined : STATUS_COLOR[technique.status];
 
   const badgeStyle =
     technique.status === "mastered"
-      ? { backgroundColor: categoryColor, borderColor: categoryColor }
+      ? { backgroundColor: statusColor, borderColor: statusColor }
       : technique.status === "learning"
-        ? { backgroundColor: `${categoryColor}26`, borderColor: categoryColor }
+        ? { backgroundColor: `${statusColor}26`, borderColor: statusColor }
         : technique.status === "skipped"
           ? { backgroundColor: theme.backgroundSelected, borderColor: theme.border }
           : { backgroundColor: "transparent", borderColor: theme.borderStrong };
 
-  const badgeTextColor =
-    technique.status === "mastered" ? theme.accentText : technique.status === "learning" ? categoryColor : theme.textSecondary;
+  const badgeTextColor = technique.status === "mastered" ? theme.accentText : (statusColor ?? theme.textSecondary);
 
   return (
     <Pressable
@@ -47,7 +54,11 @@ export function TechniqueRow({ technique, categoryColor, onPress }: TechniqueRow
           <ThemedText style={[styles.badgeIcon, { color: badgeTextColor }]}>{STATUS_ICON[technique.status]}</ThemedText>
         </View>
         <View style={styles.textColumn}>
-          <ThemedText type="smallBold" style={isSkipped ? styles.skippedText : undefined} numberOfLines={2}>
+          <ThemedText
+            type="smallBold"
+            style={[isCompleted && styles.completedText, isSkipped && styles.skippedText]}
+            numberOfLines={2}
+          >
             {technique.title}
           </ThemedText>
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>
@@ -76,7 +87,9 @@ const styles = StyleSheet.create({
   badge: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    // Square - matches the status pills in the technique-detail sheet,
+    // rather than the fully round badge shape used before.
+    borderRadius: 6,
     borderWidth: 1.5,
     alignItems: "center",
     justifyContent: "center",
@@ -90,8 +103,15 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: Spacing.half,
   },
-  skippedText: {
+  // Crossed out = done, not "won't do" - only a completed technique gets
+  // struck through.
+  completedText: {
     textDecorationLine: "line-through",
+    opacity: 0.7,
+  },
+  // Skipped is de-emphasized (dimmed) but not struck through, since it was
+  // never actually finished.
+  skippedText: {
     opacity: 0.55,
   },
   chevron: {

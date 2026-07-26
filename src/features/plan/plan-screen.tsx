@@ -122,7 +122,7 @@ export function PlanScreen() {
           style={styles.flatList}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <TechniqueRow technique={item} categoryColor={categoryColor} onPress={() => setSelectedTechniqueId(item.id)} />
+            <TechniqueRow technique={item} onPress={() => setSelectedTechniqueId(item.id)} />
           )}
         />
       </View>

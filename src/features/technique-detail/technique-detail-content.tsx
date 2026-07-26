@@ -5,20 +5,14 @@ import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 import type { Technique, TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { RESOURCE_TYPE_ACTION_LABEL, RESOURCE_TYPE_ICON, RESOURCE_TYPE_LABEL } from "@/features/plan/resource-type";
+import { STATUS_COLOR } from "@/features/plan/technique-status";
 import { searchUrlFor } from "./search-url";
 
-const STATUS_OPTIONS: { value: TechniqueStatus; label: string }[] = [
+const STATUS_OPTIONS: { value: Exclude<TechniqueStatus, "not-started">; label: string }[] = [
   { value: "learning", label: "In Progress" },
   { value: "mastered", label: "Completed" },
   { value: "skipped", label: "Skip" },
 ];
-
-// Universal status-color convention rather than the hobby's own identity
-// color - green/yellow/muted-blue reads as done/in-progress/skipped at a
-// glance regardless of which hobby's color theme is active.
-const IN_PROGRESS_COLOR = "#eab308";
-const COMPLETED_COLOR = "#22c55e";
-const SKIPPED_COLOR = "#64748b";
 
 interface TechniqueDetailContentProps {
   technique: Technique;
@@ -82,7 +76,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
       <View style={[styles.statusRow, { borderTopColor: theme.border }]}>
         {STATUS_OPTIONS.map((option) => {
           const selected = technique.status === option.value;
-          const optionColor = option.value === "mastered" ? COMPLETED_COLOR : option.value === "learning" ? IN_PROGRESS_COLOR : SKIPPED_COLOR;
+          const optionColor = STATUS_COLOR[option.value];
           return (
             <Pressable
               key={option.value}

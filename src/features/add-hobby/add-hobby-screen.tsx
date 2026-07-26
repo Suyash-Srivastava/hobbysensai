@@ -75,59 +75,63 @@ export function AddHobbyScreen() {
       >
         {/* Top inset is already handled by the native header (headerShown: true in _layout.tsx). */}
         <View style={[styles.formContent, { paddingBottom: Math.max(insets.bottom, Spacing.four) }]}>
-          <FormField
-            label="What are you learning?"
-            placeholder="e.g. chess, acoustic guitar, watercolor painting"
-            value={hobby}
-            onChangeText={setHobby}
-            error={fieldErrors.hobby}
-            required
-            editable={!mutation.isPending}
-          />
+          <View style={[styles.section, styles.sectionDivider, { borderBottomColor: theme.border }]}>
+            <FormField
+              label="What are you learning?"
+              placeholder="e.g. chess, acoustic guitar, watercolor painting"
+              value={hobby}
+              onChangeText={setHobby}
+              error={fieldErrors.hobby}
+              required
+              editable={!mutation.isPending}
+            />
 
-          <View style={styles.field}>
-            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-              Your Level
-            </ThemedText>
-            <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
+            <View style={styles.field}>
+              <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+                Your Level
+              </ThemedText>
+              <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
+            </View>
           </View>
 
-          <FormField
-            label="Main Goal"
-            placeholder="e.g. play my first jazz solo"
-            value={goal}
-            onChangeText={setGoal}
-            error={fieldErrors.goal}
-            required
-            editable={!mutation.isPending}
-            multiline
-          />
-
-          <View style={styles.field}>
-            <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
-              Weekly Budget
-            </ThemedText>
-            <View style={styles.sliderRow}>
-              <ThemedText type="title" style={styles.sliderValue}>
-                {weeklyTimeBudgetHours}
-              </ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                hours / week
-              </ThemedText>
-            </View>
-            <Slider
-              testID="weekly-budget-slider"
-              style={styles.slider}
-              minimumValue={1}
-              maximumValue={20}
-              step={1}
-              value={weeklyTimeBudgetHours}
-              onValueChange={setWeeklyTimeBudgetHours}
-              disabled={mutation.isPending}
-              minimumTrackTintColor={theme.accent}
-              maximumTrackTintColor={theme.border}
-              thumbTintColor={theme.accent}
+          <View style={styles.section}>
+            <FormField
+              label="Main Goal"
+              placeholder="e.g. play my first jazz solo"
+              value={goal}
+              onChangeText={setGoal}
+              error={fieldErrors.goal}
+              required
+              editable={!mutation.isPending}
+              multiline
             />
+
+            <View style={styles.field}>
+              <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
+                Weekly Budget
+              </ThemedText>
+              <View style={styles.sliderRow}>
+                <ThemedText type="title" style={styles.sliderValue}>
+                  {weeklyTimeBudgetHours}
+                </ThemedText>
+                <ThemedText type="small" themeColor="textSecondary">
+                  hours / week
+                </ThemedText>
+              </View>
+              <Slider
+                testID="weekly-budget-slider"
+                style={styles.slider}
+                minimumValue={1}
+                maximumValue={20}
+                step={1}
+                value={weeklyTimeBudgetHours}
+                onValueChange={setWeeklyTimeBudgetHours}
+                disabled={mutation.isPending}
+                minimumTrackTintColor={theme.accent}
+                maximumTrackTintColor={theme.border}
+                thumbTintColor={theme.accent}
+              />
+            </View>
           </View>
 
           {mutation.isError ? (
@@ -161,7 +165,16 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     paddingHorizontal: Spacing.four,
     paddingTop: Spacing.three,
-    gap: Spacing.three,
+    gap: Spacing.four,
+  },
+  // Groups related fields ("what/level" vs "goal/budget") with a hairline
+  // rule between them instead of one undifferentiated stack of inputs -
+  // matches the hairline-divider look already used elsewhere (e.g. the
+  // technique-detail status row) rather than introducing a boxed-card style.
+  section: { gap: Spacing.three },
+  sectionDivider: {
+    borderBottomWidth: 1,
+    paddingBottom: Spacing.four,
   },
   field: { gap: Spacing.one },
   sliderRow: {

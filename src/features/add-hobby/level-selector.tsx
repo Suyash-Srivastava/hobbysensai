@@ -47,8 +47,11 @@ const styles = StyleSheet.create({
   },
   pill: {
     flex: 1,
-    paddingVertical: Spacing.two,
+    // 44px minimum touch target, matching the height used for other
+    // controls (e.g. the technique-detail status pills) elsewhere in the app.
+    height: 44,
     borderRadius: Spacing.three,
     alignItems: "center",
+    justifyContent: "center",
   },
 });

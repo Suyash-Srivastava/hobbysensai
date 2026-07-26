@@ -119,6 +119,7 @@ export function PlanScreen() {
         <FlatList<Technique>
           data={visibleTechniques}
           keyExtractor={(technique) => technique.id}
+          style={styles.flatList}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
             <TechniqueRow technique={item} categoryColor={categoryColor} onPress={() => setSelectedTechniqueId(item.id)} />
@@ -180,6 +181,13 @@ const styles = StyleSheet.create({
   curriculumLabel: {
     marginTop: Spacing.four,
     marginBottom: Spacing.two,
+  },
+  // Without this, the FlatList doesn't bound itself to the remaining
+  // vertical space in the column - when the technique list is long enough
+  // to overflow, the whole column's layout goes unbounded and Android
+  // mis-renders the ResourceFilterTabs ScrollView sitting above it.
+  flatList: {
+    flex: 1,
   },
   list: {
     gap: Spacing.two,

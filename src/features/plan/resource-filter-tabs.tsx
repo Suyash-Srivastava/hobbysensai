@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
@@ -26,18 +25,6 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
   const theme = useTheme();
   const presentTypes = RESOURCE_TYPE_ORDER.filter((type) => techniques.some((t) => t.resourceType === type));
 
-  // Android sizes a filled/rounded Pressable's ripple background off the
-  // row's layout at the moment it mounts, and this row can still be mid-
-  // layout inside its horizontal ScrollView at that instant - so whichever
-  // tab starts out selected (the default "All" tab) gets squashed until any
-  // later re-render forces a fresh layout pass. Remounting once, one frame
-  // after mount, gets that correction in before anyone taps anything.
-  const [renderKey, setRenderKey] = useState(0);
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => setRenderKey((key) => key + 1));
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
   // Nothing to filter if every technique is the same single resource type.
   if (presentTypes.length < 2) return null;
 
@@ -48,7 +35,6 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
 
   return (
     <ScrollView
-      key={renderKey}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.row}

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ExternalLink } from "@/components/external-link";
 import { ThemedText } from "@/components/themed-text";
@@ -28,19 +27,6 @@ interface TechniqueDetailContentProps {
 
 export function TechniqueDetailContent({ technique, categoryColor, onClose, onChangeStatus }: TechniqueDetailContentProps) {
   const theme = useTheme();
-
-  // Same Android quirk as resource-filter-tabs: a filled/rounded Pressable's
-  // ripple background can be sized before this row finishes its own layout
-  // pass, squashing whichever status pill starts out selected (a technique
-  // already marked learning/mastered/skipped) until a later re-render fixes
-  // it. Remounting the row once, a frame after mount, does that correction
-  // proactively - keyed by technique.id so reopening a different technique
-  // re-triggers it too.
-  const [renderKey, setRenderKey] = useState(0);
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => setRenderKey((key) => key + 1));
-    return () => cancelAnimationFrame(raf);
-  }, [technique.id]);
 
   return (
     <View style={styles.container}>
@@ -80,7 +66,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
         </View>
       </ExternalLink>
 
-      <View key={renderKey} style={[styles.statusRow, { borderTopColor: theme.border }]}>
+      <View style={[styles.statusRow, { borderTopColor: theme.border }]}>
         {STATUS_OPTIONS.map((option) => {
           const selected = technique.status === option.value;
           const selectedColor = option.value === "mastered" ? categoryColor : option.value === "learning" ? LEARNING_COLOR : SKIPPED_COLOR;

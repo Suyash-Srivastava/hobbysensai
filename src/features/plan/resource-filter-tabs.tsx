@@ -56,7 +56,7 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
           >
             <View style={styles.tabInner}>
               {tab.icon ? <Text style={styles.icon}>{tab.icon}</Text> : null}
-              <ThemedText type="small" style={selected && { color: theme.accentText }}>
+              <ThemedText type="small" style={[styles.label, selected && { color: theme.accentText }]}>
                 {tab.label}
               </ThemedText>
             </View>
@@ -95,7 +95,19 @@ const styles = StyleSheet.create({
   // itself on the next layout pass, e.g. when a tab gets selected), which
   // visually squished the pill's content. Rendering the icon in its own
   // plain Text with the system default font sidesteps that entirely.
+  //
+  // includeFontPadding/textAlignVertical fix a second, separate Android-only
+  // quirk: Android's TextView reserves extra ascent/descent padding around
+  // text by default (for accents/diacritics), and that reserved space is
+  // sized inconsistently for emoji glyphs on first paint, pinning the icon
+  // toward the top of its box until a later re-layout centers it correctly.
   icon: {
     fontSize: 14,
+    includeFontPadding: false,
+    textAlignVertical: "center",
+  },
+  label: {
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
 });

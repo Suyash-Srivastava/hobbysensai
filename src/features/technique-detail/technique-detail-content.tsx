@@ -84,7 +84,7 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
             >
               <View style={styles.statusPillInner}>
                 <Text style={styles.statusIcon}>{option.icon}</Text>
-                <ThemedText type="eyebrow" style={selected && { color: theme.accentText }}>
+                <ThemedText type="eyebrow" style={[styles.statusLabel, selected && { color: theme.accentText }]}>
                   {option.label}
                 </ThemedText>
               </View>
@@ -172,7 +172,18 @@ const styles = StyleSheet.create({
   // line height on first paint (see the matching comment in
   // resource-filter-tabs.tsx), which squished this pill's content until the
   // next layout pass. A plain Text with the system default font sidesteps it.
+  //
+  // includeFontPadding/textAlignVertical fix a second Android-only quirk:
+  // the extra ascent/descent padding Android reserves around text by
+  // default is sized inconsistently for emoji glyphs on first paint,
+  // pinning the icon toward the top of its box until a later re-layout.
   statusIcon: {
     fontSize: 12,
+    includeFontPadding: false,
+    textAlignVertical: "center",
+  },
+  statusLabel: {
+    includeFontPadding: false,
+    textAlignVertical: "center",
   },
 });

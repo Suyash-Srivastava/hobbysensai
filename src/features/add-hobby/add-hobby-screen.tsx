@@ -127,16 +127,37 @@ export function AddHobbyScreen() {
           </View>
 
           {mutation.isError ? (
-            <ThemedText type="small" style={{ color: theme.error }}>
-              {(mutation.error as Error).message}
-            </ThemedText>
+            <View
+              accessibilityLiveRegion="assertive"
+              style={[styles.statusBox, { backgroundColor: `${theme.error}1A`, borderColor: theme.error }]}
+            >
+              <ThemedText type="smallBold" style={{ color: theme.error }}>
+                Couldn&apos;t generate your plan
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {(mutation.error as Error).message}
+              </ThemedText>
+            </View>
           ) : null}
 
           <View style={styles.spacer} />
 
+          {/* Plan generation is a multi-second AI call - say what's happening
+              rather than leaving only a spinner inside the button. */}
+          {mutation.isPending ? (
+            <ThemedText
+              type="small"
+              themeColor="textSecondary"
+              accessibilityLiveRegion="polite"
+              style={styles.pendingHint}
+            >
+              Designing your curriculum… this takes a few seconds.
+            </ThemedText>
+          ) : null}
+
           <Button
-            label="Generate My Plan"
-            icon="✨"
+            label={mutation.isPending ? "Generating…" : "Generate My Plan"}
+            icon={mutation.isPending ? undefined : "✨"}
             onPress={handleSubmit}
             disabled={mutation.isPending}
             loading={mutation.isPending}
@@ -160,6 +181,16 @@ const styles = StyleSheet.create({
     gap: Spacing.three,
   },
   field: { gap: Spacing.one },
+  statusBox: {
+    borderWidth: 1,
+    borderRadius: Spacing.three,
+    padding: Spacing.three,
+    gap: Spacing.half,
+  },
+  pendingHint: {
+    textAlign: "center",
+    marginBottom: Spacing.two,
+  },
   sliderRow: {
     flexDirection: "row",
     alignItems: "baseline",

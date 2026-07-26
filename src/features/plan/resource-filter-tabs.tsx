@@ -47,6 +47,9 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
             key={tab.value}
             testID={`resource-filter-${tab.value}`}
             onPress={() => onChangeFilter(tab.value)}
+            accessibilityRole="tab"
+            accessibilityLabel={`Show ${tab.label} techniques`}
+            accessibilityState={{ selected }}
             android_ripple={{ color: theme.borderStrong }}
             style={[
               styles.tab,

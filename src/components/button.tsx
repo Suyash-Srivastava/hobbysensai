@@ -42,6 +42,11 @@ export function Button({ label, onPress, variant = "primary", disabled, loading,
       testID={testID}
       onPress={onPress}
       disabled={disabled || loading}
+      accessibilityRole="button"
+      // The icon is decorative - the label alone is what a screen reader
+      // should announce, not "sparkles Generate My Plan".
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       android_ripple={{ color: theme.borderStrong }}
       style={({ pressed }) => [
         styles.base,

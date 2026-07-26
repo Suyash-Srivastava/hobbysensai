@@ -27,6 +27,9 @@ export function LevelSelector({ value, onChange }: LevelSelectorProps) {
             key={level.value}
             testID={`level-${level.value}`}
             onPress={() => onChange(level.value)}
+            accessibilityRole="radio"
+            accessibilityLabel={`${level.label} level`}
+            accessibilityState={{ selected, checked: selected }}
             android_ripple={{ color: theme.borderStrong }}
             style={[styles.pill, selected && { backgroundColor: theme.accent }]}
           >

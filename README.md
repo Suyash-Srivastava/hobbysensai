@@ -14,7 +14,7 @@ something that needs a diagram). Check techniques off as you learn them,
 skip the ones you don't care about, and track more than one hobby at once,
 fully offline after the plan is generated.
 
-![Home screen with a hobby card, progress ring, and streak](docs/screenshots/home.png)
+![Home screen with a hobby card, progress bar, and streak](docs/screenshots/home.png)
 ![Technique checklist for one hobby](docs/screenshots/plan.png)
 ![Technique detail - desktop modal variant](docs/screenshots/technique-detail-web.png)
 
@@ -82,7 +82,7 @@ src/
   app/                    expo-router routes - kept intentionally thin,
                           each route renders exactly one feature component
   features/
-    home/                 hobby list, progress rings, streak
+    home/                 hobby list, progress bars, streak
     add-hobby/             the generation form
     plan/                  one hobby's technique checklist
     technique-detail/      shared detail content, with platform-specific
@@ -111,7 +111,7 @@ default template already established for `app-tabs.tsx`.
 
 ## Gamification (kept deliberately small)
 
-A streak counter, a progress ring, and a one-line celebration banner on
+A streak counter, a progress bar, and a one-line celebration banner on
 mastering a technique - reinforcing the app's own checklist loop rather
 than becoming a second feature. No badges, levels, or history screen: those
 would be exactly the kind of feature that doesn't aid learning, which is
@@ -141,7 +141,7 @@ npm test          # both projects: app (jest-expo + React Native Testing Library
 npm run typecheck # tsc --noEmit against both tsconfig.json and api/tsconfig.json
 ```
 
-16 tests, chosen for what actually matters rather than for coverage:
+21 tests, chosen for what actually matters rather than for coverage:
 
 - **Backend:** a valid request produces a schema-valid plan; a malformed
   model response triggers the repair retry and succeeds; a response that
@@ -151,10 +151,11 @@ npm run typecheck # tsc --noEmit against both tsconfig.json and api/tsconfig.jso
   request past its configured limit.
 - **Frontend:** the store updates one hobby's technique without touching
   any other hobby in the array; a mastered/skipped status change
-  correctly advances (or doesn't advance) the streak; the progress ring
+  correctly advances (or doesn't advance) the streak; the progress bar
   renders the right fill at 0/partial/100% and clamps out-of-range input;
   the storage repository round-trips a valid plan and falls back to empty
-  state on a corrupted or outdated blob instead of throwing.
+  state on a corrupted or outdated blob instead of throwing; the Home
+  screen renders a seeded plan and navigates into it on tap.
 
 ## Deployment
 
@@ -177,10 +178,20 @@ at the time of building this (the SDK 57 Expo Go build was in store review on bo
 platforms). Pinning to 54 means the app installs straight from a QR code scan, no
 USB/ADB sideloading or development build required.
 
-## A known limitation
+## Known limitations
 
-The mobile bottom-sheet variant (`technique-detail-sheet.tsx`) is verified
-by type-checking and by the fact that it renders the same, already-verified
-content component - it hasn't been visually checked on an actual iOS/Android
-simulator in this environment, only the web/desktop modal variant has a
-live, in-browser, screenshot-verified pass.
+- **iOS is unverified.** Every flow has been exercised on a physical Android
+  device via Expo Go (and on web/desktop in-browser), which surfaced several
+  real bugs that never reproduced on web - a missing `SafeAreaProvider`, an
+  absolutely-positioned button sitting under the Android nav bar (RN
+  positions absolute children against the parent's border box, so an
+  ancestor's `paddingBottom` doesn't move them), and a `FlatList` without
+  `flex: 1` destabilising its sibling's layout once the list overflowed. The
+  iOS-specific paths (`KeyboardAvoidingView` with `behavior="padding"`, the
+  home-indicator inset) are typed and shared with the verified Android path
+  but haven't been run on an actual iOS device or simulator.
+- **The plan cache is per-instance and in-memory**, so on Vercel it's only
+  warm for the lifetime of a single serverless instance. That's deliberate
+  for this scope - it kills duplicate/retry calls, which is what the free
+  tier's rate limit actually needs - but it is not a shared cache across
+  instances.

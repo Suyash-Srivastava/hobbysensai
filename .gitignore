@@ -46,11 +46,10 @@ example
 .vercel
 .env*
 
-# Personal/local Claude Code skills - tooling, not app source
-.claude/skills/
+# Personal/local dev notes - not app source
+.claude/
 .agents/
+AGENTS.md
+CLAUDE.md
 skills-lock.json
 **/__pycache__/
-
-# Local design reference mockups - not app source
-.claude/ui screen/

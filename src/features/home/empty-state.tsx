@@ -47,6 +47,8 @@ export function EmptyState() {
               key={category}
               testID={`category-chip-${category}`}
               onPress={() => router.push("/add-hobby")}
+              accessibilityRole="button"
+              accessibilityLabel={`Add a ${HOBBY_CATEGORY_LABEL[category]} hobby`}
               android_ripple={{ color: theme.borderStrong }}
               style={[styles.chip, { borderColor: theme.border }]}
             >

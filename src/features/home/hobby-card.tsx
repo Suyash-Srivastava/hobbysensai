@@ -24,6 +24,9 @@ export function HobbyCard({ plan, isContinue, streakCount }: HobbyCardProps) {
     <Pressable
       testID={`hobby-card-${plan.id}`}
       onPress={() => router.push(`/plan/${plan.id}`)}
+      accessibilityRole="button"
+      accessibilityLabel={`${plan.hobby}, ${plan.currentLevel}, ${mastered} of ${total} techniques completed`}
+      accessibilityHint="Opens this hobby's technique checklist"
       android_ripple={{ color: theme.borderStrong }}
       style={({ pressed }) => [pressed && styles.pressed]}
     >

@@ -34,6 +34,8 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
           testID="close-technique-detail"
           onPress={onClose}
           hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Close technique details"
           android_ripple={{ color: theme.borderStrong, borderless: true, radius: 20 }}
           style={[styles.closeButton, { backgroundColor: theme.backgroundSelected }]}
         >
@@ -82,6 +84,9 @@ export function TechniqueDetailContent({ technique, categoryColor, onClose, onCh
               key={option.value}
               testID={`status-${option.value}`}
               onPress={() => onChangeStatus(option.value)}
+              accessibilityRole="radio"
+              accessibilityLabel={`Mark as ${option.label}`}
+              accessibilityState={{ selected, checked: selected }}
               android_ripple={{ color: theme.borderStrong }}
               style={[
                 styles.statusPill,

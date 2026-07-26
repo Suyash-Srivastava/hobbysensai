@@ -16,6 +16,14 @@ const STATUS_ICON: Record<TechniqueStatus, string> = {
   skipped: "»",
 };
 
+// Spoken equivalents of the badge glyphs, for accessibilityLabel.
+const STATUS_LABEL: Record<TechniqueStatus, string> = {
+  "not-started": "not started",
+  learning: "in progress",
+  mastered: "completed",
+  skipped: "skipped",
+};
+
 interface TechniqueRowProps {
   technique: Technique;
   onPress: () => void;
@@ -46,11 +54,17 @@ export function TechniqueRow({ technique, onPress }: TechniqueRowProps) {
     <Pressable
       testID={`technique-row-${technique.id}`}
       onPress={onPress}
+      accessibilityRole="button"
+      // Status is conveyed visually by badge color + glyph alone, so it has
+      // to be spelled out here or it's invisible to a screen reader.
+      accessibilityLabel={`${technique.title}, ${STATUS_LABEL[technique.status]}, about ${technique.estimatedHours} hours`}
+      accessibilityHint="Opens technique details"
       android_ripple={{ color: theme.borderStrong }}
       style={({ pressed }) => pressed && styles.pressed}
     >
       <ThemedView type="backgroundElement" style={[styles.row, { borderColor: theme.border }]}>
-        <View style={[styles.badge, badgeStyle]}>
+        {/* Decorative - the row's own accessibilityLabel already says the status. */}
+        <View style={[styles.badge, badgeStyle]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
           <ThemedText style={[styles.badgeIcon, { color: badgeTextColor }]}>{STATUS_ICON[technique.status]}</ThemedText>
         </View>
         <View style={styles.textColumn}>

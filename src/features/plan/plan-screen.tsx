@@ -34,7 +34,7 @@ export function PlanScreen() {
       <ThemedView style={styles.container}>
         <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
           <ThemedText type="subtitle">Hobby not found</ThemedText>
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Go back">
             <ThemedText type="link">Go back</ThemedText>
           </Pressable>
         </View>
@@ -81,7 +81,13 @@ export function PlanScreen() {
         topInset={insets.top}
       />
       <View style={[styles.safeArea, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow}>
+        <Pressable
+          onPress={() => router.back()}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel="Back to home"
+          style={styles.backRow}
+        >
           <ThemedText type="link">← Home</ThemedText>
         </Pressable>
 

@@ -18,6 +18,7 @@ import { JetBrainsMono_500Medium } from "@expo-google-fonts/jetbrains-mono/500Me
 import { JetBrainsMono_600SemiBold } from "@expo-google-fonts/jetbrains-mono/600SemiBold";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { Colors, Fonts } from "@/constants/theme";
 
 SplashScreen.preventAutoHideAsync();
@@ -64,25 +65,27 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen
-              name="add-hobby"
-              options={{
-                presentation: "modal",
-                headerShown: true,
-                title: "New Hobby",
-                headerStyle: { backgroundColor: theme.background },
-                headerTintColor: theme.text,
-                headerTitleStyle: { fontFamily: Fonts.semibold },
-              }}
-            />
-            <Stack.Screen name="plan/[hobbyId]" />
-          </Stack>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen
+                name="add-hobby"
+                options={{
+                  presentation: "modal",
+                  headerShown: true,
+                  title: "New Hobby",
+                  headerStyle: { backgroundColor: theme.background },
+                  headerTintColor: theme.text,
+                  headerTitleStyle: { fontFamily: Fonts.semibold },
+                }}
+              />
+              <Stack.Screen name="plan/[hobbyId]" />
+            </Stack>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }

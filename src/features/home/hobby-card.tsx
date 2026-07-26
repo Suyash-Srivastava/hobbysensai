@@ -6,7 +6,7 @@ import { ProgressBar } from "@/components/progress-bar";
 import { useTheme } from "@/hooks/use-theme";
 import { Shadow, Spacing } from "@/constants/theme";
 import { hobbyProgress, type HobbyPlan } from "@/shared/hobbyPlan.schema";
-import { HOBBY_CATEGORY_EMOJI, HOBBY_CATEGORY_LABEL, hobbyCategoryColor } from "./hobby-category-icon";
+import { HOBBY_CATEGORY_LABEL, hobbyCategoryColor } from "./hobby-category-icon";
 
 interface HobbyCardProps {
   plan: HobbyPlan;
@@ -37,7 +37,6 @@ export function HobbyCard({ plan, isContinue, streakCount }: HobbyCardProps) {
       >
         <View style={styles.headerRow}>
           <View style={styles.nameRow}>
-            <ThemedText style={styles.emoji}>{HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]}</ThemedText>
             <ThemedText type="subtitle" style={styles.title} numberOfLines={1}>
               {plan.hobby}
             </ThemedText>
@@ -97,9 +96,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Spacing.two,
     flex: 1,
-  },
-  emoji: {
-    fontSize: 20,
   },
   title: {
     fontSize: 19,

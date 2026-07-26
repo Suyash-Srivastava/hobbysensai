@@ -9,7 +9,7 @@ import { ProgressBar } from "@/components/progress-bar";
 import { MaxContentWidth, Spacing } from "@/constants/theme";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
 import { hobbyProgress, type Technique, type TechniqueStatus } from "@/shared/hobbyPlan.schema";
-import { HOBBY_CATEGORY_EMOJI, hobbyCategoryColor } from "@/features/home/hobby-category-icon";
+import { hobbyCategoryColor } from "@/features/home/hobby-category-icon";
 import { TechniqueDetailSheet } from "@/features/technique-detail/technique-detail-sheet";
 import { TechniqueRow } from "./technique-row";
 import { MasteryCelebration } from "./mastery-celebration";
@@ -87,7 +87,7 @@ export function PlanScreen() {
 
         <View style={styles.header}>
           <ThemedText type="eyebrow" style={{ color: categoryColor }}>
-            {HOBBY_CATEGORY_EMOJI[plan.hobbyCategory]} {plan.hobby} · {plan.currentLevel}
+            {plan.hobby} · {plan.currentLevel}
           </ThemedText>
           <ThemedText type="title" style={styles.title} numberOfLines={2}>
             {plan.goal}

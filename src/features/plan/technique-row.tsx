@@ -11,7 +11,7 @@ import { STATUS_COLOR } from "./technique-status";
 // and "passed on" (skipped).
 const STATUS_ICON: Record<TechniqueStatus, string> = {
   "not-started": "",
-  learning: "↻",
+  learning: "⌛",
   mastered: "✓",
   skipped: "»",
 };

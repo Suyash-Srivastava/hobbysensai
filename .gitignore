@@ -54,3 +54,9 @@ AGENTS.md
 CLAUDE.md
 skills-lock.json
 **/__pycache__/
+
+# Original, unprocessed source photos - only the cropped/compressed assets
+# actually used by the app (hero.jpg, hero@2x.jpg, hero@3x.jpg) are tracked.
+# Keeping a multi-MB source photo in git history for a 90KB shipped asset
+# isn't worth it; this stays on disk for future re-cropping if needed.
+assets/images/heroimage/hobbysensaihome.png

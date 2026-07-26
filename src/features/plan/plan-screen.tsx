@@ -11,6 +11,7 @@ import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
 import { hobbyProgress, type Technique, type TechniqueStatus } from "@/shared/hobbyPlan.schema";
 import { hobbyCategoryColor } from "@/features/home/hobby-category-icon";
 import { TechniqueDetailSheet } from "@/features/technique-detail/technique-detail-sheet";
+import { GradientWash } from "@/components/gradient-wash";
 import { TechniqueRow } from "./technique-row";
 import { MasteryCelebration } from "./mastery-celebration";
 import { ResourceFilterTabs, type ResourceFilter } from "./resource-filter-tabs";
@@ -67,13 +68,7 @@ export function PlanScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <View
-        pointerEvents="none"
-        style={[
-          styles.headerWash,
-          { experimental_backgroundImage: `linear-gradient(180deg, ${categoryColor}3d 0%, transparent 100%)` },
-        ]}
-      />
+      <GradientWash color={categoryColor} style={styles.headerWash} />
       <MasteryCelebration
         triggerKey={celebrationKey}
         color={categoryColor}

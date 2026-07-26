@@ -6,6 +6,7 @@ import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 import type { HobbyCategory } from "@/shared/hobbyPlan.schema";
 import { HOBBY_CATEGORY_LABEL, hobbyCategoryColor } from "./hobby-category-icon";
+import { EmptyStateHero } from "./empty-state-hero";
 
 const SUGGESTED_CATEGORIES: HobbyCategory[] = [
   "physical-skill",
@@ -21,14 +22,9 @@ export function EmptyState() {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.hero,
-          {
-            experimental_backgroundImage: `linear-gradient(135deg, ${theme.accent}55 0%, ${theme.paperSurface}22 60%, transparent 100%)`,
-          },
-        ]}
-      />
+      <View style={styles.heroWrapper}>
+        <EmptyStateHero />
+      </View>
 
       <ThemedText type="title" style={styles.headline}>
         The first step is the hardest.
@@ -71,10 +67,8 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     paddingHorizontal: Spacing.four,
   },
-  hero: {
+  heroWrapper: {
     width: "100%",
-    height: 140,
-    borderRadius: Spacing.four,
     marginBottom: Spacing.three,
   },
   headline: {

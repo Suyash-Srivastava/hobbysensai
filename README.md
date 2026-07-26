@@ -159,7 +159,7 @@ npm run typecheck # tsc --noEmit against both tsconfig.json and api/tsconfig.jso
 
 ## Deployment
 
-One Vercel project serves both halves:
+One Vercel project serves both halves: **[hobbysensai.vercel.app](https://hobbysensai.vercel.app)**
 
 - `vercel.json` builds the Expo web export (`expo export --platform web`
   → `dist/`) as the static site, and Vercel auto-detects the `/api/*.ts`
@@ -167,16 +167,25 @@ One Vercel project serves both halves:
 - A rewrite maps `/plan/:hobbyId` to the static `[hobbyId]` shell so a
   direct link to any hobby's plan resolves correctly, not just in-app
   navigation.
-- Set `GEMINI_API_KEY` (and optionally `GEMINI_MODEL`,
-  `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_WINDOW_MS`) as environment
-  variables in the Vercel project - never commit `.env`.
+- `GEMINI_API_KEY` (and `GEMINI_MODEL`, `RATE_LIMIT_MAX_REQUESTS`,
+  `RATE_LIMIT_WINDOW_MS`, `LOG_LEVEL`) are set as environment variables on the
+  Vercel project directly - never commit `.env`.
 
-Mobile is demoed via `npx expo start` and Expo Go rather than an EAS build - the
-project deliberately pins **Expo SDK 54** rather than the newest SDK, since the
-public Expo Go app on both the Play Store and App Store was still stuck on SDK 54
-at the time of building this (the SDK 57 Expo Go build was in store review on both
-platforms). Pinning to 54 means the app installs straight from a QR code scan, no
-USB/ADB sideloading or development build required.
+### Mobile
+
+Two ways to run it on a phone:
+
+- **QR code via Expo Go** (`npx expo start`, scan the QR code) - the
+  project deliberately pins **Expo SDK 54** rather than the newest SDK,
+  since the public Expo Go app on both the Play Store and App Store was
+  still stuck on SDK 54 at the time of building this. No USB/ADB
+  sideloading or development build required.
+- **Standalone Android APK** - built with EAS Build
+  (`eas build --platform android --profile preview`, see `eas.json`),
+  which bakes in the deployed backend URL above via
+  `EXPO_PUBLIC_API_BASE_URL` at build time (a standalone app has no dev
+  server to fall back on, unlike Expo Go). Distributed as an internal
+  build, so it installs directly - no Play Store review needed.
 
 ## Known limitations
 

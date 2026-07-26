@@ -8,7 +8,7 @@ export function buildSystemInstruction(): string {
     "First classify the hobby into exactly one hobbyCategory: physical-skill, musical, strategy-game, creative-craft, or knowledge-based.",
     "For each technique, choose the resourceType that actually fits how that specific technique is best learned - do not default to the same resourceType for every technique in the list, and do not pick a format mismatched to the hobby.",
     "Never propose a multiple-choice quiz for a physical or strategy skill that requires practiced judgement. Never propose an audio-only or video-only lesson for a technique better taught through diagrams, worked examples, or hands-on drills.",
-    "Each technique needs a short searchQuery a learner could paste into a video or search platform to find a good lesson on that exact technique.",
+    "Each technique needs a searchQuery: a short, natural search phrase tailored to the specific platform its resourceType actually lands on, not a generic restatement of the title. For 'video' or 'drill', phrase it the way someone would search YouTube for a tutorial (include a word like 'tutorial' or 'how to' when it reads naturally). For 'article', phrase it the way someone would search the web for a written guide (include a word like 'guide' or 'explained' when natural). For 'diagram', explicitly include the word 'diagram' or 'chart' so an image search actually surfaces one, not a generic photo. For 'interactive', phrase it to find an interactive practice tool, trainer, or simulator for that exact technique.",
     "Return strict JSON matching the provided schema and nothing else - no prose, no markdown code fences.",
   ].join(" ");
 }

@@ -3,12 +3,11 @@ import { useTheme } from "@/hooks/use-theme";
 import { Spacing } from "@/constants/theme";
 
 /**
- * Cropped/compressed from a single warm "hobby flat-lay" source photo (see
- * assets/images/heroimage/hobbysensaihome.png, kept out of git - only the
- * @1x/@2x/@3x crops actually shipped are tracked). The crop deliberately
- * avoids the source image's own baked-in tagline text, since that can't
- * adapt to the app's light/dark theme or typography the way the screen's
- * real headline below it does.
+ * Center-cropped square + compressed from a single warm "hobby flat-lay"
+ * source photo (see assets/images/heroimage/hobbysensaihome.png, kept out of
+ * git - only the @1x/@2x/@3x squares actually shipped are tracked). Matches
+ * what resizeMode="cover" on a square box already crops to, just at a
+ * fraction of the file size of the full source photo.
  */
 export function EmptyStateHero() {
   const theme = useTheme();
@@ -17,7 +16,7 @@ export function EmptyStateHero() {
   return (
     <View style={[styles.container, { borderColor: theme.border }]}>
       {/* A literal require() is what lets RN's static asset resolution pick the right @2x/@3x density. */}
-      <Image source={require("../../../assets/images/heroimage/hero.jpg")} style={styles.image} resizeMode="cover" />
+      <Image source={require("../../../assets/images/heroimage/hero-square.jpg")} style={styles.image} resizeMode="cover" />
       {/* A light photo reads too bright against the dark theme's page background - a soft tint blends it in rather than looking like a pasted-in rectangle. */}
       {scheme === "dark" ? <View style={[styles.scrim, { backgroundColor: theme.background }]} /> : null}
     </View>
@@ -31,8 +30,8 @@ const styles = StyleSheet.create({
     // asset was generated from) - deriving height this way instead of a
     // fixed pixel value keeps the box from stretching the photo to fit an
     // unrelated size if the crop ratio ever changes.
-    aspectRatio: 1.9,
-    borderRadius: Spacing.four,
+    aspectRatio: 1,
+    borderRadius: Spacing.two,
     borderWidth: 1,
     overflow: "hidden",
   },

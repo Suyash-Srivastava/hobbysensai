@@ -27,7 +27,11 @@ export function EmptyStateHero() {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    height: 140,
+    // Matches the shipped crop's own aspect ratio (see the crop script this
+    // asset was generated from) - deriving height this way instead of a
+    // fixed pixel value keeps the box from stretching the photo to fit an
+    // unrelated size if the crop ratio ever changes.
+    aspectRatio: 1.9,
     borderRadius: Spacing.four,
     borderWidth: 1,
     overflow: "hidden",

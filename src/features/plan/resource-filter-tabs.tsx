@@ -42,7 +42,7 @@ export function ResourceFilterTabs({ techniques, activeFilter, onChangeFilter, c
   if (presentTypes.length < 2) return null;
 
   const tabs: { value: ResourceFilter; icon?: string; label: string }[] = [
-    { value: "all", label: "All" },
+    { value: "all", icon: "🗂️", label: "All" },
     ...presentTypes.map((type) => ({ value: type, icon: RESOURCE_TYPE_ICON[type], label: RESOURCE_TYPE_LABEL[type] })),
   ];
 

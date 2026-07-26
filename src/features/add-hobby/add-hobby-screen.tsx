@@ -8,7 +8,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Button } from "@/components/button";
 import { useTheme } from "@/hooks/use-theme";
-import { MaxContentWidth, Spacing } from "@/constants/theme";
+import { MaxContentWidth, Shadow, Spacing } from "@/constants/theme";
 import { fetchLearningPlan } from "@/lib/api/learningPlanClient";
 import { generateId } from "@/lib/id";
 import { useHobbyPlansStore } from "@/store/hobbyPlansStore";
@@ -75,7 +75,10 @@ export function AddHobbyScreen() {
       >
         {/* Top inset is already handled by the native header (headerShown: true in _layout.tsx). */}
         <View style={[styles.formContent, { paddingBottom: Math.max(insets.bottom, Spacing.four) }]}>
-          <View style={[styles.section, styles.sectionDivider, { borderBottomColor: theme.border }]}>
+          <ThemedView type="backgroundElement" style={[styles.card, { borderColor: theme.border }]}>
+            <ThemedText type="smallBold" style={styles.cardTitle}>
+              Hobby Basics
+            </ThemedText>
             <FormField
               label="What are you learning?"
               placeholder="e.g. chess, acoustic guitar, watercolor painting"
@@ -85,18 +88,18 @@ export function AddHobbyScreen() {
               required
               editable={!mutation.isPending}
             />
-          </View>
-
-          <View style={[styles.section, styles.sectionDivider, { borderBottomColor: theme.border }]}>
             <View style={styles.field}>
               <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
                 Your Level
               </ThemedText>
               <LevelSelector value={currentLevel} onChange={setCurrentLevel} />
             </View>
-          </View>
+          </ThemedView>
 
-          <View style={[styles.section, styles.sectionDivider, { borderBottomColor: theme.border }]}>
+          <ThemedView type="backgroundElement" style={[styles.card, { borderColor: theme.border }]}>
+            <ThemedText type="smallBold" style={styles.cardTitle}>
+              Goal &amp; Pace
+            </ThemedText>
             <FormField
               label="Main Goal"
               placeholder="e.g. play my first jazz solo"
@@ -107,9 +110,6 @@ export function AddHobbyScreen() {
               editable={!mutation.isPending}
               multiline
             />
-          </View>
-
-          <View style={styles.section}>
             <View style={styles.field}>
               <ThemedText type="smallBold" style={{ color: theme.eyebrow }}>
                 Weekly Budget
@@ -136,7 +136,7 @@ export function AddHobbyScreen() {
                 thumbTintColor={theme.accent}
               />
             </View>
-          </View>
+          </ThemedView>
 
           {mutation.isError ? (
             <ThemedText type="small" style={{ color: theme.error }}>
@@ -168,19 +168,23 @@ const styles = StyleSheet.create({
     width: "100%",
     maxWidth: MaxContentWidth,
     paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.three,
-    gap: Spacing.three,
+    paddingTop: Spacing.two,
+    gap: Spacing.two,
   },
-  // Each field gets its own section with a hairline rule below it, instead
-  // of one undifferentiated stack of inputs - matches the hairline-divider
-  // look already used elsewhere (e.g. the technique-detail status row)
-  // rather than introducing a boxed-card style. Kept tight (not the
-  // heavier spacing a card treatment would use) since this screen
-  // deliberately doesn't scroll - it all has to fit on one small screen.
-  section: { gap: Spacing.three },
-  sectionDivider: {
-    borderBottomWidth: 1,
-    paddingBottom: Spacing.three,
+  // Grouped as elevated cards - matching the same card language already
+  // used for hobby cards and technique rows elsewhere in the app - rather
+  // than hairline dividers between every field, which read as too busy at
+  // this density. Padding/gap kept tighter than that card pattern usually
+  // uses, since this screen deliberately doesn't scroll.
+  card: {
+    borderRadius: Spacing.four,
+    borderWidth: 1,
+    padding: Spacing.two,
+    gap: Spacing.two,
+    boxShadow: Shadow.card,
+  },
+  cardTitle: {
+    fontSize: 15,
   },
   field: { gap: Spacing.one },
   sliderRow: {

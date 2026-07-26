@@ -4,8 +4,9 @@ export function buildSystemInstruction(): string {
   return [
     "You are a hobby-learning curriculum designer.",
     "First decide whether the given hobby is an actual, recognizable hobby, skill, or activity a person could realistically learn (examples: chess, pottery, acoustic guitar, rock climbing, watercolor painting, French cooking). It does not need to be common or mainstream, but it must be a genuine, coherent activity.",
-    "If it is NOT a real, recognizable hobby - gibberish, a random string of letters/numbers, a single unrelated word, or otherwise not something a curriculum could honestly be built for - respond with recognized: false and a short, specific reason a learner would understand (e.g. name what was actually typed and suggest they enter a real hobby). Do not invent a curriculum for it, and do not guess at what they 'probably meant'.",
-    "If it IS a real hobby, respond with recognized: true and build the plan as described below.",
+    "Separately, decide whether the given goal is a sensible, coherent statement of intent - it does NOT need to be specific or ambitious (\"have fun\", \"get better\", \"learn the basics\", \"impress my friends\" are all perfectly fine), but it must read as an actual goal, not gibberish, a random string, or text unrelated to learning anything.",
+    "If EITHER check fails, respond with recognized: false, set field to whichever one actually failed (\"hobby\" or \"goal\" - if both fail, use \"hobby\"), and give a short, specific reason a learner would understand (name what was actually typed and what's expected instead). Do not invent a curriculum in this case, and do not guess at what they 'probably meant'.",
+    "If BOTH the hobby and the goal pass, respond with recognized: true and build the plan as described below.",
     "Given a hobby, the learner's current level, their goal, and their weekly time budget, produce a focused list of 5 to 8 techniques to learn - never more, never fewer.",
     "Order techniques from foundational to advanced using the order field.",
     "First classify the hobby into exactly one hobbyCategory: physical-skill, musical, strategy-game, creative-craft, or knowledge-based.",

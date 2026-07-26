@@ -12,8 +12,16 @@ import { logger } from "../logger";
 
 export class LearningPlanGenerationError extends Error {}
 
-/** The model looked at the input and decided it isn't a real, learnable hobby. */
-export class HobbyNotRecognizedError extends Error {}
+/** The model looked at the hobby or the goal and decided it isn't sensible input. */
+export class InputNotRecognizedError extends Error {
+  field: "hobby" | "goal";
+
+  constructor(message: string, field: "hobby" | "goal") {
+    super(message);
+    this.name = "InputNotRecognizedError";
+    this.field = field;
+  }
+}
 
 // Gemini's structured-output subset doesn't include every JSON Schema
 // keyword (e.g. no $schema) - strip what it doesn't recognize rather than
@@ -100,8 +108,11 @@ export async function generateLearningPlan(
   }
 
   if (!parsed.data.recognized) {
-    logger.info({ provider: provider.name, hobby: request.hobby, reason: parsed.data.reason }, "hobby not recognized");
-    throw new HobbyNotRecognizedError(parsed.data.reason);
+    logger.info(
+      { provider: provider.name, hobby: request.hobby, field: parsed.data.field, reason: parsed.data.reason },
+      "input not recognized",
+    );
+    throw new InputNotRecognizedError(parsed.data.reason, parsed.data.field);
   }
 
   const { hobbyCategory, techniques } = parsed.data;

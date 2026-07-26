@@ -67,12 +67,13 @@ export function AddHobbyScreen() {
       await addPlan(plan);
       router.replace(`/plan/${plan.id}`);
     } catch (error) {
-      // The AI itself decided "hobby" isn't a real, recognizable hobby (see
-      // promptBuilder's recognized:false path) - point at the specific
-      // field instead of just a generic bottom-of-form error, since this is
-      // something the user needs to fix, not a transient failure to retry.
-      if (error instanceof LearningPlanRequestError && error.code === "hobby_not_recognized") {
-        setFieldErrors({ hobby: error.message });
+      // The AI itself decided the hobby or the goal isn't sensible input
+      // (see promptBuilder's recognized:false path) - point at whichever
+      // specific field it named instead of just a generic bottom-of-form
+      // error, since this is something the user needs to fix, not a
+      // transient failure to retry.
+      if (error instanceof LearningPlanRequestError && error.code === "input_not_recognized" && error.field) {
+        setFieldErrors({ [error.field]: error.message });
       }
     }
   };
@@ -137,10 +138,10 @@ export function AddHobbyScreen() {
             />
           </View>
 
-          {/* "Not a recognized hobby" points at the hobby field itself
-              (fieldErrors.hobby, set in the catch above) instead of
-              duplicating the same message down here too. */}
-          {mutation.isError && !(mutation.error instanceof LearningPlanRequestError && mutation.error.code === "hobby_not_recognized") ? (
+          {/* "Input not recognized" points at the specific field itself
+              (fieldErrors, set in the catch above) instead of duplicating
+              the same message down here too. */}
+          {mutation.isError && !(mutation.error instanceof LearningPlanRequestError && mutation.error.code === "input_not_recognized") ? (
             <View
               accessibilityLiveRegion="assertive"
               style={[styles.statusBox, { backgroundColor: `${theme.error}1A`, borderColor: theme.error }]}

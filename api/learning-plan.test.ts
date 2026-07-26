@@ -56,11 +56,15 @@ test("a valid request returns 200 with a schema-valid plan", async () => {
   expect(data.plan.techniques).toHaveLength(5);
 });
 
-test("a nonsense hobby name is rejected with a 422 and a hobby_not_recognized code", async () => {
+test("a nonsense hobby name is rejected with a 422, input_not_recognized, and field: hobby", async () => {
   jest.mocked(getAIProvider).mockReturnValue({
     name: "mock-provider",
     generateJson: jest.fn(async () =>
-      JSON.stringify({ recognized: false, reason: "'das43' doesn't look like a real hobby - try chess, pottery, or guitar." }),
+      JSON.stringify({
+        recognized: false,
+        field: "hobby",
+        reason: "'das43' doesn't look like a real hobby - try chess, pottery, or guitar.",
+      }),
     ),
   });
   const { req, res } = mockRequestResponse({
@@ -73,9 +77,37 @@ test("a nonsense hobby name is rejected with a 422 and a hobby_not_recognized co
   await handler(req, res);
 
   expect(res._getStatusCode()).toBe(422);
-  const data = res._getJSONData() as { error: string; code: string };
-  expect(data.code).toBe("hobby_not_recognized");
+  const data = res._getJSONData() as { error: string; code: string; field: string };
+  expect(data.code).toBe("input_not_recognized");
+  expect(data.field).toBe("hobby");
   expect(data.error).toMatch(/das43/);
+});
+
+test("a nonsense goal is rejected with a 422, input_not_recognized, and field: goal", async () => {
+  jest.mocked(getAIProvider).mockReturnValue({
+    name: "mock-provider",
+    generateJson: jest.fn(async () =>
+      JSON.stringify({
+        recognized: false,
+        field: "goal",
+        reason: "'asdkjfh' isn't a real goal - try describing what you want to be able to do.",
+      }),
+    ),
+  });
+  const { req, res } = mockRequestResponse({
+    hobby: "guitar",
+    currentLevel: "beginner",
+    goal: "asdkjfh",
+    weeklyTimeBudgetHours: 4,
+  });
+
+  await handler(req, res);
+
+  expect(res._getStatusCode()).toBe(422);
+  const data = res._getJSONData() as { error: string; code: string; field: string };
+  expect(data.code).toBe("input_not_recognized");
+  expect(data.field).toBe("goal");
+  expect(data.error).toMatch(/asdkjfh/);
 });
 
 test("an invalid request body returns 400 and never calls the AI provider", async () => {

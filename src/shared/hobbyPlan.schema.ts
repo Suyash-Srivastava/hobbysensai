@@ -77,17 +77,21 @@ export const learningPlanResponseSchema = z.object({
 export type LearningPlanResponse = z.infer<typeof learningPlanResponseSchema>;
 
 /**
- * The LLM's raw output can also be a rejection - "das43" or "asdkjfh" isn't
- * a hobby, and generating a confident 5-8 step curriculum for gibberish
- * anyway is worse than admitting it doesn't recognize the input. This union
- * is what the model is actually constrained to (see buildSystemInstruction);
- * the plain success schema above is what the rest of the app sees once the
- * service layer has resolved this into either a plan or a thrown error.
+ * The LLM's raw output can also be a rejection - "das43" as a hobby, or
+ * "asdkjfh" as a goal, and generating a confident 5-8 step curriculum for
+ * gibberish anyway is worse than admitting it doesn't recognize the input.
+ * `field` says which one is actually the problem, so the app can point the
+ * error at that specific input instead of a generic "something's wrong".
+ * This union is what the model is actually constrained to (see
+ * buildSystemInstruction); the plain success schema above is what the rest
+ * of the app sees once the service layer has resolved this into either a
+ * plan or a thrown error.
  */
 export const learningPlanModelOutputSchema = z.discriminatedUnion("recognized", [
   learningPlanResponseSchema.extend({ recognized: z.literal(true) }),
   z.object({
     recognized: z.literal(false),
+    field: z.enum(["hobby", "goal"]),
     reason: z.string().trim().min(5).max(200),
   }),
 ]);

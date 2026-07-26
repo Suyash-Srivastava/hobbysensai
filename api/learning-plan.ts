@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { learningPlanRequestSchema } from "../src/shared/hobbyPlan.schema";
-import { generateLearningPlan, HobbyNotRecognizedError, LearningPlanGenerationError } from "./_lib/services/learningPlan.service";
+import { generateLearningPlan, InputNotRecognizedError, LearningPlanGenerationError } from "./_lib/services/learningPlan.service";
 import { getAIProvider } from "./_lib/providers/ai/factory";
 import { isRateLimited } from "./_lib/middleware/rateLimit";
 import { applyCors } from "./_lib/middleware/cors";
@@ -39,8 +39,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { plan, cached } = await generateLearningPlan(getAIProvider(), parsedRequest.data);
     res.status(200).json({ plan, cached });
   } catch (error) {
-    if (error instanceof HobbyNotRecognizedError) {
-      res.status(422).json({ error: error.message, code: "hobby_not_recognized" });
+    if (error instanceof InputNotRecognizedError) {
+      res.status(422).json({ error: error.message, code: "input_not_recognized", field: error.field });
       return;
     }
     if (error instanceof LearningPlanGenerationError) {

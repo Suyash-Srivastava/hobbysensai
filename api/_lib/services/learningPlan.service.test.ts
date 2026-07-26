@@ -1,4 +1,4 @@
-import { generateLearningPlan, HobbyNotRecognizedError, LearningPlanGenerationError } from "./learningPlan.service";
+import { generateLearningPlan, InputNotRecognizedError, LearningPlanGenerationError } from "./learningPlan.service";
 import { clearCacheForTests } from "../cache/planCache";
 import type { AIProvider } from "../providers/ai/AIProvider";
 import type { LearningPlanRequest, LearningPlanResponse } from "../../../src/shared/hobbyPlan.schema";
@@ -41,8 +41,8 @@ function validPlanJson(overrides: Partial<LearningPlanResponse> = {}): string {
   return JSON.stringify(plan);
 }
 
-function notRecognizedJson(reason: string): string {
-  return JSON.stringify({ recognized: false, reason });
+function notRecognizedJson(field: "hobby" | "goal", reason: string): string {
+  return JSON.stringify({ recognized: false, field, reason });
 }
 
 beforeEach(() => {
@@ -91,10 +91,23 @@ test("a resourceType mismatched to the hobby category is coerced to an allowed t
 });
 
 test("a nonsense hobby is rejected with the model's own reason, without ever producing a plan", async () => {
-  const provider = fakeProvider([notRecognizedJson("'das43' doesn't look like a real hobby - try something specific like chess, pottery, or guitar.")]);
+  const provider = fakeProvider([
+    notRecognizedJson("hobby", "'das43' doesn't look like a real hobby - try something specific like chess, pottery, or guitar."),
+  ]);
 
-  await expect(generateLearningPlan(provider, baseRequest({ hobby: "das43" }))).rejects.toBeInstanceOf(
-    HobbyNotRecognizedError,
-  );
-  await expect(generateLearningPlan(provider, baseRequest({ hobby: "das43" }))).rejects.toThrow(/das43/);
+  const error = await generateLearningPlan(provider, baseRequest({ hobby: "das43" })).catch((e) => e);
+  expect(error).toBeInstanceOf(InputNotRecognizedError);
+  expect(error.field).toBe("hobby");
+  expect(error.message).toMatch(/das43/);
+});
+
+test("a nonsense goal is rejected the same way, naming 'goal' as the field", async () => {
+  const provider = fakeProvider([
+    notRecognizedJson("goal", "'asdkjfh' isn't a real goal - try describing what you want to be able to do."),
+  ]);
+
+  const error = await generateLearningPlan(provider, baseRequest({ goal: "asdkjfh" })).catch((e) => e);
+  expect(error).toBeInstanceOf(InputNotRecognizedError);
+  expect(error.field).toBe("goal");
+  expect(error.message).toMatch(/asdkjfh/);
 });

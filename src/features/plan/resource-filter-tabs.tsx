@@ -71,11 +71,20 @@ const styles = StyleSheet.create({
   },
   row: {
     gap: Spacing.two,
+    alignItems: "center",
   },
   tab: {
-    paddingVertical: Spacing.one,
+    // Fixed height (not just vertical padding) so a tab's pill shape can't
+    // be inflated by content - Android substitutes a system emoji font for
+    // glyphs like the TV/weight-lifter icons that Inter doesn't cover, and
+    // that fallback font can render taller than the text's own lineHeight,
+    // which would otherwise make only the emoji tabs look taller than "All".
+    height: 34,
     paddingHorizontal: Spacing.three,
     borderRadius: Spacing.five,
     borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
 });

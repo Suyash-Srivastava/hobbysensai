@@ -153,9 +153,15 @@ const styles = StyleSheet.create({
   },
   statusPill: {
     flex: 1,
-    paddingVertical: Spacing.two,
+    // Fixed height rather than just vertical padding - see the matching
+    // comment on resource-filter-tabs' tab style for why: Android's emoji
+    // font fallback (for the icons in these labels) can render taller than
+    // the text's lineHeight and bulge an auto-sized Pressable unevenly.
+    height: 44,
     borderRadius: Spacing.three,
     borderWidth: 1,
     alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
 });

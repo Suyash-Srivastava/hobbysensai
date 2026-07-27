@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { learningPlanRequestSchema } from "../src/shared/hobbyPlan.schema";
 import { generateLearningPlan, InputNotRecognizedError, LearningPlanGenerationError } from "./_lib/services/learningPlan.service";
+import { AIProviderRateLimitedError } from "./_lib/providers/ai/AIProvider";
 import { getAIProvider } from "./_lib/providers/ai/factory";
 import { isRateLimited } from "./_lib/middleware/rateLimit";
 import { applyCors } from "./_lib/middleware/cors";
@@ -41,6 +42,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (error) {
     if (error instanceof InputNotRecognizedError) {
       res.status(422).json({ error: error.message, code: "input_not_recognized", field: error.field });
+      return;
+    }
+    if (error instanceof AIProviderRateLimitedError) {
+      // A different failure mode from our own isRateLimited() check above -
+      // that one is us throttling the client; this is the upstream AI
+      // provider (Gemini's free-tier RPM cap) throttling us. 503, not 429,
+      // to keep the two distinguishable in logs/metrics - the client-facing
+      // message and retry behavior end up the same either way.
+      logger.warn({ error: error.message }, "AI provider rate-limited this request");
+      res.status(503).json({
+        error: "The AI service is busy right now. Please wait a few seconds and try again.",
+        code: "ai_provider_busy",
+      });
       return;
     }
     if (error instanceof LearningPlanGenerationError) {

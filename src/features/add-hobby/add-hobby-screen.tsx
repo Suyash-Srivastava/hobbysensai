@@ -89,7 +89,7 @@ export function AddHobbyScreen() {
         <View style={[styles.formContent, { paddingBottom: Math.max(insets.bottom, Spacing.four) }]}>
           <FormField
             label="What are you learning?"
-            placeholder="e.g. chess, acoustic guitar, watercolor painting"
+            placeholder="e.g. chess, guitar"
             value={hobby}
             onChangeText={setHobby}
             error={fieldErrors.hobby}
@@ -147,7 +147,13 @@ export function AddHobbyScreen() {
               style={[styles.statusBox, { backgroundColor: `${theme.error}1A`, borderColor: theme.error }]}
             >
               <ThemedText type="smallBold" style={{ color: theme.error }}>
-                Couldn&apos;t generate your plan
+                {/* Gemini's free-tier RPM cap, not a real failure - already
+                    retried twice by the mutation's own retry logic by the
+                    time this shows, so "try again" is genuinely the fix,
+                    not just a platitude. */}
+                {mutation.error instanceof LearningPlanRequestError && mutation.error.code === "ai_provider_busy"
+                  ? "The AI is busy right now"
+                  : "Couldn't generate your plan"}
               </ThemedText>
               <ThemedText type="small" themeColor="textSecondary">
                 {(mutation.error as Error).message}

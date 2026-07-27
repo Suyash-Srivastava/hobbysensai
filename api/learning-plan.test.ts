@@ -2,6 +2,7 @@ import { createMocks } from "node-mocks-http";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { clearRateLimitForTests } from "./_lib/middleware/rateLimit";
 import { clearCacheForTests } from "./_lib/cache/planCache";
+import { AIProviderRateLimitedError } from "./_lib/providers/ai/AIProvider";
 import type { LearningPlanResponse } from "../src/shared/hobbyPlan.schema";
 
 jest.mock("./_lib/providers/ai/factory", () => ({
@@ -108,6 +109,27 @@ test("a nonsense goal is rejected with a 422, input_not_recognized, and field: g
   expect(data.code).toBe("input_not_recognized");
   expect(data.field).toBe("goal");
   expect(data.error).toMatch(/asdkjfh/);
+});
+
+test("the AI provider being rate-limited (e.g. Gemini's free-tier RPM cap) surfaces as a 503, ai_provider_busy", async () => {
+  jest.mocked(getAIProvider).mockReturnValue({
+    name: "mock-provider",
+    generateJson: jest.fn(async () => {
+      throw new AIProviderRateLimitedError("Gemini provider (fake) rate-limited this request: 429");
+    }),
+  });
+  const { req, res } = mockRequestResponse({
+    hobby: "guitar",
+    currentLevel: "beginner",
+    goal: "play campfire songs",
+    weeklyTimeBudgetHours: 4,
+  });
+
+  await handler(req, res);
+
+  expect(res._getStatusCode()).toBe(503);
+  const data = res._getJSONData() as { error: string; code: string };
+  expect(data.code).toBe("ai_provider_busy");
 });
 
 test("an invalid request body returns 400 and never calls the AI provider", async () => {

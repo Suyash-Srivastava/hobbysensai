@@ -1,6 +1,6 @@
 import { generateLearningPlan, InputNotRecognizedError, LearningPlanGenerationError } from "./learningPlan.service";
 import { clearCacheForTests } from "../cache/planCache";
-import type { AIProvider } from "../providers/ai/AIProvider";
+import { AIProviderRateLimitedError, type AIProvider } from "../providers/ai/AIProvider";
 import type { LearningPlanRequest, LearningPlanResponse } from "../../../src/shared/hobbyPlan.schema";
 
 function fakeProvider(responses: string[]): AIProvider {
@@ -110,4 +110,20 @@ test("a nonsense goal is rejected the same way, naming 'goal' as the field", asy
   expect(error).toBeInstanceOf(InputNotRecognizedError);
   expect(error.field).toBe("goal");
   expect(error.message).toMatch(/asdkjfh/);
+});
+
+test("the AI provider being rate-limited propagates immediately, without a pointless repair-retry call", async () => {
+  const provider: AIProvider = {
+    name: "fake-provider",
+    generateJson: jest.fn(async () => {
+      throw new AIProviderRateLimitedError("Gemini provider (fake) rate-limited this request: 429");
+    }),
+  };
+
+  await expect(generateLearningPlan(provider, baseRequest())).rejects.toBeInstanceOf(AIProviderRateLimitedError);
+  // A malformed-JSON response gets one repair attempt (see the test above),
+  // but a rate limit isn't a JSON-shape problem a repair prompt could ever
+  // fix - retrying immediately would likely just hit the same rate limit
+  // again, so this should call the provider exactly once, not twice.
+  expect(provider.generateJson).toHaveBeenCalledTimes(1);
 });
